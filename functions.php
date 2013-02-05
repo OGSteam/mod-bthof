@@ -401,29 +401,31 @@
 	//Update table bthof_flottes 
 	//-----------------------------------
 
-  function Update_Flotte()
-  {
-    global $db;
-		$sql = 'DELETE FROM ' . TABLE_BTHOF_FLOTTES . '';
-		$resultat = mysql_query ($sql);
-		
-    // Controle de l'existance du mod flotte et de son activation.
-    /* inutile maintenant puisque appelé seulement par la page flotte quand le mod est installé
-    $query = "SELECT active FROM `".TABLE_MOD."` WHERE `title`='Flottes'";
-    $result = $db->sql_query($query);
-    $modflotte = $db->sql_fetch_row($result);
-    if ($modflotte[0] == "1")
-      {*/
-      // Je suis quasiment sur qu'on peux faire sans cette table ... à voir !!
-		  $req = mysql_query ("SELECT SUM(PT) as PT, SUM(GT) AS GT, SUM(CLE) AS CLE, SUM(CLO) AS CLO, SUM(CR) AS CR, SUM(VB) AS VB, SUM(VC) AS VC, SUM(REC) AS REC, SUM(SE) AS SE, SUM(BMD) AS BMD, SUM(DST) AS DST, SUM(EDLM) AS EDLM, SUM(TRA) AS TRA, SUM(SAT) AS SAT,user_id FROM ".TABLE_FLOTTES." GROUP BY user_id");
-		  while($resultat = mysql_fetch_array ($req))
-		    {
-        $resultat = "INSERT INTO ".TABLE_BTHOF_FLOTTES." (user_id, PT, GT, CLE, CLO, CR, VB, VC, REC, SE, BMD, DST, EDLM, TRA, SAT) VALUES ('$resultat[user_id]', '$resultat[PT]', '$resultat[GT]', '$resultat[CLE]', '$resultat[CLO]', '$resultat[CR]', '$resultat[VB]', '$resultat[VC]', '$resultat[REC]', '$resultat[SE]', '$resultat[BMD]', '$resultat[DST]', '$resultat[EDLM]', '$resultat[TRA]', '$resultat[SAT]')";
-        $resultat = mysql_query($resultat);
-		    }
-      //}
-  }
-    function url_exists($url){
+    function Update_Flotte()
+    {
+        global $db;
+            $sql = 'DELETE FROM ' . TABLE_BTHOF_FLOTTES . '';
+            $resultat = mysql_query ($sql);
+            
+        // Controle de l'existance du mod flotte et de son activation.
+        /* inutile maintenant puisque appelé seulement par la page flotte quand le mod est installé
+        $query = "SELECT active FROM `".TABLE_MOD."` WHERE `title`='Flottes'";
+        $result = $db->sql_query($query);
+        $modflotte = $db->sql_fetch_row($result);
+        if ($modflotte[0] == "1")
+          {*/
+          // Je suis quasiment sur qu'on peux faire sans cette table ... à voir !!
+              $req = mysql_query ("SELECT SUM(PT) as PT, SUM(GT) AS GT, SUM(CLE) AS CLE, SUM(CLO) AS CLO, SUM(CR) AS CR, SUM(VB) AS VB, SUM(VC) AS VC, SUM(REC) AS REC, SUM(SE) AS SE, SUM(BMD) AS BMD, SUM(DST) AS DST, SUM(EDLM) AS EDLM, SUM(TRA) AS TRA, SUM(SAT) AS SAT,user_id FROM ".TABLE_FLOTTES." GROUP BY user_id");
+              while($resultat = mysql_fetch_array ($req))
+                {
+            $resultat = "INSERT INTO ".TABLE_BTHOF_FLOTTES." (user_id, PT, GT, CLE, CLO, CR, VB, VC, REC, SE, BMD, DST, EDLM, TRA, SAT) VALUES ('$resultat[user_id]', '$resultat[PT]', '$resultat[GT]', '$resultat[CLE]', '$resultat[CLO]', '$resultat[CR]', '$resultat[VB]', '$resultat[VC]', '$resultat[REC]', '$resultat[SE]', '$resultat[BMD]', '$resultat[DST]', '$resultat[EDLM]', '$resultat[TRA]', '$resultat[SAT]')";
+            $resultat = mysql_query($resultat);
+                }
+          //}
+    }
+    
+    function url_exists($url) 
+    {
         $url = str_replace("http://", "", $url);
         if (strstr($url, "/")) {
             $url = explode("/", $url, 2);
@@ -444,19 +446,15 @@
     function aff_img($imag)
     {
         global $lien;
-        // on vérifie si l'image existe, en vérifiant sa taille ^_^ , fonctionne avec les images locales ou remote
-        if($size=@getimagesize($lien . $imag))
-        {
-            // elle existe donc on l'affiche
-            echo "<img src='" . $lien . $imag . "' /><br />";
-        }
-        else
-        {
-        	// Manque d'image don dans le mod maintenant
-            // sinon on affiche celle d'un site extérieur
-            //echo "<img src='http://renaissance.wow.free.fr/DL/Metal-BridgeFF1200/gebaeude/" . $imag . "' /><br />";
-            // Image du mod
+        $handle = fopen($lien . $imag, "r");
+        
+        if($handle == FALSE) {
+            //affichage des images du mod par défaut
             echo "<img src='mod/bthof/picture/".$imag."'/><br />";
+        } else {
+            // elle existe donc on l'affiche
+            echo "<img src='" . $lien . $imag . "' /><br />"; 
+            fclose($handle);           
         }
     }
 
