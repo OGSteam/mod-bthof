@@ -424,37 +424,33 @@
           //}
     }
     
-    function url_exists($url) 
-    {
-        $url = str_replace("http://", "", $url);
-        if (strstr($url, "/")) {
-            $url = explode("/", $url, 2);
-            $url[1] = "/".$url[1];
-        } else {
-            $url = array($url, "/");
+    function url_exists($url) {
+    // Version 4.x supported
+        $handle   = curl_init($url);
+        if (false === $handle)
+        {
+            return false;
         }
-
-        $fh = fsockopen($url[0], 80);
-        if ($fh) {
-            fputs($fh,"GET ".$url[1]." HTTP/1.1\nHost:".$url[0]."\n\n");
-            if (fread($fh, 22) == "HTTP/1.1 404 Not Found") { return FALSE; }
-            else { return TRUE;    }
-
-        } else { return FALSE;}
+        curl_setopt($handle, CURLOPT_HEADER, false);
+        curl_setopt($handle, CURLOPT_FAILONERROR, true);  // this works
+        curl_setopt($handle, CURLOPT_NOBODY, true);
+        curl_setopt($handle, CURLOPT_RETURNTRANSFER, false);
+        $connectable = curl_exec($handle);
+        curl_close($handle);   
+        return $connectable;
     }
 
     function aff_img($imag)
     {
         global $lien;
-        $handle = fopen($lien . $imag, "r");
         
-        if($handle == FALSE) {
-            //affichage des images du mod par défaut
-            echo "<img src='mod/bthof/picture/".$imag."'/><br />";
-        } else {
+        if(url_exists($lien . $imag)) {
             // elle existe donc on l'affiche
             echo "<img src='" . $lien . $imag . "' /><br />"; 
-            fclose($handle);           
+            fclose($handle);
+        } else {
+            //affichage des images du mod par défaut
+            echo "<img src='mod/bthof/picture/".$imag."'/><br />";
         }
     }
 
