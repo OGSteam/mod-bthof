@@ -570,6 +570,15 @@ require_once("mod/bthof/functions.php");
 							</ul>
 						</td>
 					</tr>
+					<tr>
+						<td style='background-color : #273234; text-align : center;'>1.0.4</td>
+						<td style='background-color : #273234;'>
+							<i>Mise à jour par Pitch314</i>
+							<ul>
+								<li>Correction erreur sur miniatures inexistantes.</li>								
+							</ul>
+						</td>
+					</tr>
 				</table>
 			
 				<?php		
