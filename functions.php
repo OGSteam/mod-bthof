@@ -425,19 +425,29 @@
     }
     
     function url_exists($url) {
-    // Version 4.x supported
-        $handle   = curl_init($url);
-        if (false === $handle)
-        {
-            return false;
+        if(function_exists('curl_init')) {
+        // Version php 4.x supported
+            $handle   = curl_init($url);
+            if (false === $handle)
+            {
+                return false;
+            }
+            curl_setopt($handle, CURLOPT_HEADER, false);
+            curl_setopt($handle, CURLOPT_FAILONERROR, true);  // this works
+            curl_setopt($handle, CURLOPT_NOBODY, true);
+            curl_setopt($handle, CURLOPT_RETURNTRANSFER, false);
+            $connectable = curl_exec($handle);
+            curl_close($handle);   
+            return $connectable;
+        } else {
+          //version php 5
+            $file_headers = get_headers($url);
+            if (preg_match("|200|",$file_headers[0]) {
+                return true;
+            } else {
+                return false;
+            }
         }
-        curl_setopt($handle, CURLOPT_HEADER, false);
-        curl_setopt($handle, CURLOPT_FAILONERROR, true);  // this works
-        curl_setopt($handle, CURLOPT_NOBODY, true);
-        curl_setopt($handle, CURLOPT_RETURNTRANSFER, false);
-        $connectable = curl_exec($handle);
-        curl_close($handle);   
-        return $connectable;
     }
 
     function aff_img($imag)
@@ -446,8 +456,7 @@
         
         if(url_exists($lien . $imag)) {
             // elle existe donc on l'affiche
-            echo "<img src='" . $lien . $imag . "' /><br />"; 
-            fclose($handle);
+            echo "<img src='" . $lien . $imag . "' /><br />";
         } else {
             //affichage des images du mod par défaut
             echo "<img src='mod/bthof/picture/".$imag."'/><br />";

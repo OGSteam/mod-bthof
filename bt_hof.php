@@ -15,11 +15,11 @@
 	 * ************************************************************************* */
 	
 	if (!defined ('IN_SPYOGAME'))		die("Hacking attempt");
+    
 	// charge le fichier functions.php
-require_once("mod/bthof/functions.php");
+    require_once("mod/bthof/functions.php");
 	
-	// error_reporting(E_ALL);
-	
+	// error_reporting(E_ALL);	
 	require_once("views/page_header.php");
 
 	if (!isset ($table_prefix))		global $table_prefix;
@@ -104,9 +104,11 @@ require_once("mod/bthof/functions.php");
 
 	// Prendre le skin serveur par défaut s'il n'y en a pas dans le profil utilisateur
 	if ($user_data["user_skin"]."a" == "a") {
-		$lien = $server_config["default_skin"]."gebaeude/";}
-	else 
+		//$lien = $server_config["default_skin"]."gebaeude/";
+        $lien = "mod/bthof/picture/";
+    } else {
 		$lien = $user_data["user_skin"]."gebaeude/";
+    }
 
 	/* ** Menu Principal ** */
 	
