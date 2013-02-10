@@ -35,7 +35,7 @@ if ($is_ok == true)
 			."  ) COMMENT='sauvegarde des paramètres bt_hof'";
 			$db->sql_query($query);
 
-		$query = "INSERT INTO ".TABLE_BTHOF_CONF." (user_id, icon_display_active, bbcode_t, bbcode_o, bbcode_r, bbcode_l) VALUES ('','1','orange','','red','yellow')";
+		$query = "INSERT INTO ".TABLE_BTHOF_CONF." (user_id, icon_display_active, bbcode_t, bbcode_o, bbcode_r, bbcode_l) VALUES ('0','1','orange','','red','yellow')";
 			$db->sql_query($query);
 
 		$query = "CREATE TABLE `".$table_prefix.'bthof_flottes'."` ("
