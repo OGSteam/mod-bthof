@@ -24,9 +24,8 @@
     // ==============================================//
     function Create_Mine_HOF()
     {
-    //if (!isset($nplayer))	global $nplayer;
-        $user_empire = user_get_empire();
-        $nb_planet = find_nb_planete_user();
+        require_once("includes/ogame.php");
+        
         if (!isset($production_metal))     { global $production_metal; }
         if (!isset($production_cristal))   { global $production_cristal; }
         if (!isset($production_deuterium)) { global $production_deuterium; }
@@ -34,111 +33,91 @@
         if (!isset($production_joueur))    { global $production_joueur; }
         if (!isset($table_prefix))         { global $table_prefix; }
         if (!isset($db))                   { global $db; }
+        
         $planet = array(false, 'user_id' => '', 'planet_name' => '', 'coordinates' => '',
                         'fields' => '', 'fields_used' => '', 'temperature_min' => '',
                         'temperature_max' => '', 'Sat' => '', 'M' => 0, 'C' => 0,
                         'D' => 0, 'CES' => 0, 'CEF' => 0 , 'M_percentage' => 0, 
                         'C_percentage' => 0, 'D_percentage' => 0, 'CES_percentage' => 100,
                         'CEF_percentage' => 100, 'Sat_percentage' => 100);
-        $sql = "SELECT DISTINCT u.user_id,user_name,off_geologue FROM ".TABLE_USER." u,".$table_prefix."user_building b WHERE user_active AND u.user_id=b.user_id";
+        
+        $sql = "SELECT DISTINCT u.user_id,user_name,`off_ingenieur`,`off_geologue`, `NRJ`, `Plasma` ".
+               "FROM ". TABLE_USER ." u JOIN ". TABLE_USER_TECHNOLOGY ." b ".
+                    "ON u.user_id = b.user_id ".
+               "WHERE user_active='1'";
         $result = $db->sql_query($sql);
-
         $nplayer=0;
         //Début boucle sur joueur
-        while ($player = mysql_fetch_array($result, MYSQL_NUM))
+        // while ($player = mysql_fetch_array($result, MYSQL_NUM))
+        while ($player = $db->sql_fetch_row($result))
         {
-            $user_id=$player[0];
-
-            $query_officer = $db->sql_query("SELECT `off_ingenieur`,`off_geologue` FROM ".TABLE_USER." WHERE user_id = ".$user_id);
-            list($off_ingenieur, $off_geologue) = $db->sql_fetch_row($query_officer);
+            $metal_heure   = 0;
+            $cristal_heure = 0;
+            $deut_heure    = 0;
+            
+            list($user_id, $user_name, $off_ingenieur, $off_geologue, $NRJ, $plasma) = $player;
+            $nb_planet = find_real_nb_planete_user($user_id);
+//echo $user_name.' ing '.$off_ingenieur.' geo '.$off_geologue.' nrj '.$NRJ.' plasma '.$plasma.'<br />';
+            if ($nb_planet == 0) { //Si le joueur n'a pas de planète encore répertoriée
+                continue;
+            } 
 
          // Récupération des informations sur les mines du joueur
-            $quet = mysql_query('SELECT planet_id, planet_name, coordinates, `fields`, temperature_min, temperature_max, Sat, M, C, D, CES, CEF, M_percentage, C_percentage, D_percentage, CES_percentage, CEF_percentage, Sat_percentage FROM '.TABLE_USER_BUILDING.' WHERE user_id = '.$user_id.' ORDER BY planet_id');
+            $sql = 'SELECT DISTINCT planet_id,planet_name,coordinates,`fields`,'.
+                        'temperature_min,temperature_max,Sat,M,C,D,CES,CEF,'.
+                        'M_percentage, C_percentage, D_percentage, '.
+                        'CES_percentage, CEF_percentage, Sat_percentage '.
+                   'FROM '.TABLE_USER_BUILDING. 
+                  ' WHERE user_id = '.$user_id.' and planet_id < 199 '.
+                  'ORDER BY planet_id';
+            $quet = $db->sql_query($sql);
             $user_building = array_fill(1, $nb_planet, $planet);
 
-        // Récupération des informations sur les technologies du joueur
-            $user_technology = $user_empire["technology"];
-            $NRJ = $user_technology['NRJ'];
-
         // Boucle sur les systèmes d'un joueur
-            while ($row = mysql_fetch_assoc($quet))
+            // while ($row = mysql_fetch_assoc($quet))
+            while ($row = $db->sql_fetch_assoc($quet))
             {
-                $arr = $row;
-                unset($arr['planet_id']);
-                unset($arr['planet_name']);
-                unset($arr['coordinates']);
-                unset($arr['fields']);
-                unset($arr['temperature_min']);
-                unset($arr['temperature_max']);
-                unset($arr['Sat']);
-                $fields_used = array_sum(array_values($arr));
 
-                $row['fields_used'] = $fields_used;
-                $user_building[$row['planet_id']] = $row;
-                $user_building[$row['planet_id']][0] = true;
+                $production_CES = ($row['CES_percentage'] / 100) * floor(production("CES", $row['CES'], $off_ingenieur));
+                $production_CEF = ($row['CEF_percentage'] / 100) * floor(production("CEF", $row['CEF'], $off_ingenieur, $row['temperature_max'], $NRJ));
+                $production_SAT = ($row['Sat_percentage'] / 100) * floor(production_sat($row['temperature_min'], $row['temperature_max'], $off_ingenieur )) * $row['Sat'];
+                $prod_energie   = $production_CES + $production_CEF + $production_SAT;
 
-            // calcul des productions
-            global $db, $server_config;
-            require_once("includes/ogame.php");
+                $consommation_M = ($row['M_percentage'] / 100) * floor(consumption("M", $row['M']));
+                $consommation_C = ($row['C_percentage'] / 100) * floor(consumption("C", $row['C']));
+                $consommation_D = ($row['D_percentage'] / 100) * floor(consumption("D", $row['D']));
+                $cons_energie   = $consommation_M + $consommation_C + $consommation_D;
 
-                $metal_heure   = 0;
-                $cristal_heure = 0;
-                $deut_heure    = 0;
-                $metal_jour    = 0;
-                $cristal_jour  = 0;
-                $deut_jour     = 0;
-                $start         = 101;
-                $nb_planet     = find_nb_planete_user();
-                for ($i=$start ; $i<=$start+$nb_planet-1 ; $i++)
-                {	
-                    $M = $user_building[$i]['M'];
-                    $C = $user_building[$i]['C'];
-                    $D = $user_building[$i]['D'];
-                    $CES = $user_building[$i]['CES'];
-                    $CEF = $user_building[$i]['CEF'];
-                    $SAT = $user_building[$i]['Sat'];
-                    $M_per = $user_building[$i]['M_percentage'];
-                    $C_per = $user_building[$i]['C_percentage'];
-                    $D_per = $user_building[$i]['D_percentage'];
-                    $CES_per = $user_building[$i]['CES_percentage'];
-                    $CEF_per = $user_building[$i]['CEF_percentage'];
-                    $SAT_per = $user_building[$i]['Sat_percentage'];
-                    $temperature_min = $user_building[$i]['temperature_min'];
-                    $temperature_max = $user_building[$i]['temperature_max'];
-                    $production_CES = ( $CES_per / 100 ) * ( production( "CES", $CES, $off_ingenieur ));
-                    $production_CEF = ( $CEF_per / 100 ) * ( production("CEF", $CEF, $off_ingenieur, $temperature_max, $NRJ ));
-                    $production_SAT = ( $SAT_per / 100 ) * ( production_sat( $temperature_min, $temperature_max, $off_ingenieur ) * $SAT );
-                    $prod_energie   = $production_CES + $production_CEF + $production_SAT;
+                if ($cons_energie == 0) {
+                    $cons_energie = 1;
+                }
+                $ratio = floor(($prod_energie / $cons_energie) * 100) / 100;
+                if ($ratio > 1) {
+                    $ratio = 1;
+                }
+                $metal_heure   = $metal_heure   + (production("M", $row['M'], $off_geologue,0,0,$plasma) * $ratio);
+                $cristal_heure = $cristal_heure + (production("C", $row['C'], $off_geologue,0,0,$plasma) * $ratio);
+                $deut_heure    = $deut_heure    + (production("D", $row['D'], $off_geologue, $row['temperature_max']) * $ratio);
+                $deut_heure    = $deut_heure - (floor(consumption("CEF", $row['CEF']) * $row['CEF_percentage'] / 100));
 
-                    $consommation_M = ( $M_per / 100 ) * ( consumption( "M", $M ));
-                    $consommation_C = ( $C_per / 100 ) * ( consumption( "C", $C ));
-                    $consommation_D = ( $D_per / 100 ) * ( consumption( "D", $D ));
-                    $cons_energie   = $consommation_M + $consommation_C + $consommation_D;
-
-                    if ($cons_energie == 0) {
-                        $cons_energie = 1;
-                    }
-                    $ratio = floor(($prod_energie / $cons_energie) * 100) / 100;
-                    if ($ratio > 1) {
-                        $ratio = 1;
-                    }
-
-                    $metal_heure   = $metal_heure   + (( production( "M", $M, $off_geologue )) * $ratio);
-                    $cristal_heure = $cristal_heure + (( production( "C", $C, $off_geologue )) * $ratio);
-                    $deut_heure    = $deut_heure    + ((( production( "D", $D, $off_geologue, $temperature_max )) * $ratio) -  ((consumption ("CEF", $CEF)) * ( $CEF_per / 100 )));
-                }			
-
-                $metal_jour = 24 * $metal_heure;
-                $cristal_jour = 24 * $cristal_heure;
-                $deut_jour = 24 * $deut_heure;
-                $production_joueur[$nplayer]=$player[1];
-                $production_metal[$nplayer]=$metal_jour;
-                $production_cristal[$nplayer]=$cristal_jour;
-                $production_deuterium[$nplayer]=$deut_jour;
-                $production_total[$nplayer]=$metal_jour+$cristal_jour+$deut_jour;
-            } // Fin Boucle sur les systèmes d'un joueur
+//echo '<p><b>'.$row['planet_name'].'</b><br />';
+// echo 'CES='.$production_CES.' CEF='.$production_CEF.' SAT='.$production_SAT;
+// echo ' cons_M='.$consommation_M.' cons_C='.$consommation_C.' cons_D='.$consommation_D;
+// echo ' ratio='.$ratio.'<br />';
+// echo 'M='.(production("M", $row['M'], $off_geologue,0,0,$plasma) * $ratio).'C='.(production("C", $row['C'], $off_geologue,0,0,$plasma) * $ratio);
+// echo ' D+='.(production("D", $row['D'], $off_geologue, $row['temperature_max']) * $ratio);
+// echo ' D-='.(consumption("CEF", $row['CEF']) * $row['CEF_percentage'] / 100);
+// echo '</p>';
+            }
+            $production_joueur[$nplayer] = $user_name;
+            $production_metal[$nplayer]     = 24 * $metal_heure;
+            $production_cristal[$nplayer]   = 24 * $cristal_heure;
+            $production_deuterium[$nplayer] = 24 * $deut_heure;
+            $production_total[$nplayer]     = 24 * ($metal_heure + $cristal_heure + $deut_heure);
+            
             $nplayer ++;
         } //Fin boucle joueur
+        mysql_free_result($quet);
         mysql_free_result($result);
         return $nplayer;
     }
@@ -171,24 +150,24 @@
         }
         
         print("<table align='center'>");
-        print("<tr><th width='150px'><font color=\'#FF00FF\'>".$Title."</font></th><th width='50px'><font color=\'#FF00FF\'>Max</font></th><th width='300px'><font color=\'#FF00FF\'>Joueur(s)</font></th>");
+        print("<tr><th width='150px'><font color=#00F0F0>".$Title."</font></th><th width='50px'><font color=#00F0F0>Max</font></th><th width='300px'><font color='#00F0F0'>Joueur(s)</font></th>");
         if ($Title != "Flottes" and $Title != "Technologies") {
-            print ("<th width='50px'><font color=\'#FF00FF\'>Cumul&nbsp;Total</font></th><th width='300px'><font color=\'#FF00FF\'>Joueur(s)</font></th>");
+            print ("<th width='50px'><font color=#00F0F0>Cumul&nbsp;Total</font></th><th width='300px'><font color=#00F0F0>Joueur(s)</font></th>");
         }
         print ("</tr>");
         print ("<tr> <td width=\"30px\">&nbsp;</td> </tr>");
 
+        //Pour chaque Batiment/techno/flotte
         for ($NoBld=0 ; $NoBld <= $NbItems ; $NoBld ++)
-        {#########################################=> Requête SQL à améliorer ! (JOIN + 1 seule requête.#########################
+        {
           //Requète SQL pour récupérer la valeur Max de chaque type et le nom du joueur associé classé par ordre décroissant			
-            $sql = "SELECT MAX($Table_name[$NoBld]) ,user_name FROM ".$table_prefix.$OGSpy_Table.", ".TABLE_USER.
-                   " WHERE ".TABLE_USER.".user_active AND " .TABLE_USER.".user_id=".$table_prefix.$OGSpy_Table.".user_id" .
-                   " GROUP BY user_name ORDER BY 1 DESC";
+            $sql = "SELECT MAX($Table_name[$NoBld]) ,user_name FROM ".$table_prefix.$OGSpy_Table." T JOIN ".TABLE_USER.
+                   " U ON U.user_id = T.user_id WHERE U.user_active='1' GROUP BY user_name ORDER BY 1 DESC";
             $result = $db->sql_query($sql);
+            
           //Requète SQL pour récupérer le total par joueur classé par ordre décroissant
-            $sql2 ="SELECT SUM($Table_name[$NoBld]) ,user_name FROM ".$table_prefix.$OGSpy_Table.", ".TABLE_USER.
-                   " WHERE ".TABLE_USER.".user_active AND ".TABLE_USER.".user_id=".$table_prefix.$OGSpy_Table.".user_id".
-                   " GROUP BY user_name ORDER BY 1 DESC";
+            $sql2 ="SELECT SUM($Table_name[$NoBld]) ,user_name FROM ".$table_prefix.$OGSpy_Table." T JOIN ".TABLE_USER.
+                   " U ON U.user_id = T.user_id WHERE U.user_active='1' GROUP BY user_name ORDER BY 1 DESC";
             $result2 = $db->sql_query($sql2);
 
             $val = -1;
@@ -227,11 +206,14 @@
             }
             if ($Title != "Flottes" and $Title != "Technologies") 
             {
-                print("</font></td>");
+                print("</td>");
                 $val = -1;
                 $flag = 0;
                 while ($row2 = mysql_fetch_array($result2)) {
                     $val = $row2[0];
+                    if ($val == 0) {
+                        $row2[1] = '-';
+                    }
                    // ce controle sert à afficher les ex aequo s'il y en a !!
                     if($flag == 1) {
                      //si la valeur est inférieur à la valeur max -> on sort 
@@ -256,58 +238,61 @@
         echo "\n\t\t" . '</table>';
         return 1;
     }
-			
-	// ================================
-	// = Creation de la chaine BBcode =
-	// ================================//
-	
-	function HOF_bbcode ($Table_name,$Table_label,$Title,$OGSpy_Table,$NbItems,$b1,$b2,$b3)
-	{
-		if (!isset($table_prefix))global $table_prefix;
-		if (!isset($db))	global $db;
-		if (!isset($lien))	global $lien;
-		if (!isset($bbcode))	global $bbcode;
 
-		for ($NoBld=0;$NoBld<=$NbItems;$NoBld ++)
-		{
-			$sql ="select max($Table_name[$NoBld]) ,user_name 
-			      from ".$table_prefix.$OGSpy_Table.", ".TABLE_USER."
-			      where ".TABLE_USER.".user_active and ".TABLE_USER.".user_id=".$table_prefix.$OGSpy_Table.".user_id"
-						." group by user_name order by 1 desc";
-			
-			$result = $db->sql_query($sql);
-			$val = -1;
-			$premiere_fois = 0;
-			$bbcode .= "";
-			
-			while ($row = mysql_fetch_array($result, MYSQL_NUM)) 
-			{
-			   	$val = $row[0];
-			    if($premiere_fois == 1)
-				{
-				    if ($val_max > $val) 
-					{
-						break;
-					}
-					$bbcode .= ", ".$row[1];
+    // ================================
+    // = Creation de la chaine BBcode =
+    // ================================//
+
+    function HOF_bbcode ($Table_name,$Table_label,$Title,$OGSpy_Table,$NbItems,$b1,$b2,$b3)
+    {
+        if (!isset($table_prefix)) { global $table_prefix; }
+        if (!isset($db))           { global $db; }
+        if (!isset($lien))         { global $lien; }
+        if (!isset($bbcode))       { global $bbcode; }
+
+        for ($NoBld=0;$NoBld<=$NbItems;$NoBld ++)
+        {
+            $sql = "SELECT MAX($Table_name[$NoBld]) ,user_name FROM ".$table_prefix.$OGSpy_Table." T JOIN ".TABLE_USER.
+                   " U ON U.user_id = T.user_id WHERE U.user_active='1' GROUP BY user_name ORDER BY 1 DESC";
+            //echo $NoBld .' : '.$sql.'<br />';
+            $result = $db->sql_query($sql);
+            $val = -1;
+            $premiere_fois = 0;
+            $bbcode .= "";
+
+            while ($row = mysql_fetch_array($result, MYSQL_NUM)) 
+            {
+                $val = $row[0];
+                if($premiere_fois != 0)
+                {
+                    $premiere_fois++;
+                    if ($val_max > $val) {
+                        break;
+                    }
+                    $bbcode .= ", ".$row[1];
+                } else {
+                    $premiere_fois++;
+                    $val_max = $row[0];
+                    if($b1=='') {
+                        $bbcode .= " - ".$Table_label[$NoBld];
+                    } else {
+                        $bbcode .= " - [color=".$b1."]".$Table_label[$NoBld]."[/color]";
+                    }
+                    if($b2=='') {
+                        $bbcode .= $row[0];
+                    } else {
+                        $bbcode .= " : [color=".$b2."]".$row[0]."[/color]";
+                    }
+                    if($b3=='') {
+                        $bbcode .= $row[1];
+                    } else {
+                        $bbcode .= " : [color=".$b3."]".$row[1];
+                    }
 				}
-			    else
-				{
-					$premiere_fois=1;
-					$val_max = $row[0];
-					if($b1=='')  $bbcode .= " - ".$Table_label[$NoBld];
-					else  $bbcode .= " - [color=".$b1."]".$Table_label[$NoBld]."[/color]";
-
-					if($b2=='')  $bbcode .= $row[0];
-					else  $bbcode .= " : [color=".$b2."]".$row[0]."[/color]";
-
-					if($b3=='')  $bbcode .= $row[1];
-					else  $bbcode .= " : [color=".$b3."]".$row[1];
-				}
-
 			}
-			
-			$bbcode .="[/color]\n";
+            if ($premiere_fois!=0) {
+                $bbcode .= "[/color]\n";
+            }
 			mysql_free_result($result);
 		}
 		
@@ -452,6 +437,21 @@
             echo "<img src='mod/bthof/pictures/".$imag."'/><br />";
         }
     }
+    
+    function find_real_nb_planete_user($user_id)
+    {
+        global $db;
 
+        $request  =  "SELECT count(planet_id) ";
+        $request .= " FROM " . TABLE_USER_BUILDING;
+        $request .= " WHERE user_id = " . $user_id;
+        $request .= " AND planet_id < 199 ";
+        $request .= " ORDER BY planet_id";
+        
+        $result = $db->sql_query($request);
+        
+        $tmp = $db->sql_fetch_row();
+        return $tmp[0];
+    }
 
 ?>
