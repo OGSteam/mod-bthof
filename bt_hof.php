@@ -240,6 +240,11 @@
             break;
         case "Production" : //Page production minière
             $type_production = Array( Array ( 'titre'=>'jour' , 'x'=>1 ) , Array ( 'titre'=>'semaine' , 'x'=>7 ) );
+            
+            Create_Mine_HOF();
+            
+            // Page de production de {$pub_mine}
+            arsort(${'production_'.$pub_mine});
             foreach($type_production as $tbl) {
 ?>
                 <table style='width : 60%; text-align : center; margin-bottom : 20px;'>
@@ -251,14 +256,11 @@
                     <td class='c' style='width : 18%;'><a href='index.php?action=bt_hof&amp;subaction=Production&amp;mine=total'>Total</a></td>
                 </tr>
 <?php
-                Create_Mine_HOF();
                 $valid_pub_mine = Array ('metal','cristal','deuterium','total');
                 if(!in_array($pub_mine,$valid_pub_mine)) {
                     $pub_mine = 'total';
                 }
 
-                // Page de production de {$pub_mine}
-                arsort(${'production_'.$pub_mine});
                 $nb = 1;
                 foreach (${'production_'.$pub_mine} as $key => $val) {
 ?>
@@ -293,7 +295,7 @@
             $bbcode .= "\n\n[b][color=".$bbcode_t."]Défense[/color][/b]\n\n";
             $bbcode .= HOF_bbcode($Def_name,$Def_label,"Défense","user_defence",7,$bbcode_o,$bbcode_r,$bbcode_l);
 
-            $bbcode .= "\n[b][color=".$bbcode_t."]Production[/color][/b]\n\n";
+            $bbcode .= "\n\n[b][color=".$bbcode_t."]Production[/color][/b]\n\n";
 
             Create_Mine_HOF();
             arsort($production_metal);
@@ -349,6 +351,29 @@
             } else {
                 $bbcode .= "[color=".$bbcode_l."]".$production_joueur[$key]."[/color]\n";
             }
+            
+            arsort(${'production_total'});
+            $bbcode .= "\n\n[b][color=".$bbcode_t."]Classement production minière :[/color][/b]\n\n";
+
+            $bbcode .= '[table cellspacing="2"]'."\n";
+            $bbcode .= '[tr][td colspan="2"][color=#ff00ff][b]Production par jour[/b][/color][/td]';
+            $bbcode .= '[td][color=#00ffff][b]Métal[/b][/color][/td]';
+            $bbcode .= '[td][color=#00ffff][b]Cristal[/b][/color][/td]';
+            $bbcode .= '[td][color=#00ffff][b]Deutérium[/b][/color][/td]';
+            $bbcode .= '[td align="center"][b]Total[/b][/td][/tr]'."\n";
+            
+            $nb = 1;
+            foreach (${'production_total'} as $key => $val) {
+                $bbcode .= '[tr][td][color=white][b]'.$nb.'[/b][/color][/td]';
+                $bbcode .= '[td]'.$production_joueur[$key].'[/td]';
+                $bbcode .= '[td align="right"][color=red][b]'.number_format($production_metal[$key], 0, ',', ' ').'[/b][/color][/td]';
+                $bbcode .= '[td align="right"][color=lightblue][b]'.number_format($production_cristal[$key], 0, ',', ' ').'[/b][/color][/td]';
+                $bbcode .= '[td align="right"][color=green][b]'.number_format($production_deuterium[$key], 0, ',', ' ').'[/b][/color][/td]';
+                $bbcode .= '[td align="right"][color=grey]'.number_format($production_total[$key], 0, ',', ' ').'[/color][/td][/tr]'."\n";
+                
+                $nb++;
+            }
+            $bbcode .= "[/table]\n";
 ?>
             <textarea rows='25' cols='15' style='border : 3px ridge silver; padding : 10px; font-size : 12px;' id='bbcode3'>
                 <?php echo $bbcode; ?>
@@ -609,7 +634,7 @@
                     <td style='background-color : #273234;'>
                         <i>Mise à jour par Shad</i>
                         <ul>
-                            <li>Ajout des cachettes métal, cristal et deutérium.</li>								
+                            <li>Ajout des cachettes métal, cristal et deutérium.</li>
                         </ul>
                     </td>
                 </tr>
@@ -618,7 +643,19 @@
                     <td style='background-color : #273234;'>
                         <i>Mise à jour par Pitch314</i>
                         <ul>
-                            <li>Correction erreur sur miniatures inexistantes.</li>								
+                            <li>Correction erreur sur miniatures inexistantes.</li>
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+                    <td style='background-color : #273234; text-align : center;'>1.1.0</td>
+                    <td style='background-color : #273234;'>
+                        <i>Mise à jour par Pitch314</i>
+                        <ul>
+                            <li>Correction pour serveur sans "Curl".</li>
+                            <li>Prise en compte de la technologie plasma.</li>
+                            <li>Optimisation HOF production.</li>
+                            <li>Correction et ajout au générateur de bbcode.</li>
                         </ul>
                     </td>
                 </tr>
