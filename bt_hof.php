@@ -295,61 +295,61 @@
             $bbcode .= "\n\n[b][color=".$bbcode_t."]Défense[/color][/b]\n\n";
             $bbcode .= HOF_bbcode($Def_name,$Def_label,"Défense","user_defence",7,$bbcode_o,$bbcode_r,$bbcode_l);
 
-            $bbcode .= "\n\n[b][color=".$bbcode_t."]Production[/color][/b]\n\n";
+            $bbcode .= "\n\n[b][color=".$bbcode_t."]Production par jour[/color][/b]\n\n";
 
             Create_Mine_HOF();
-            arsort($production_metal);
-            list($key,$val) = each($production_metal);
+            
+            $maxvalue = doublemax($production_metal);
             if($bbcode_o=='') {
                 $bbcode .= "- Métal : ";
             } else {
                 $bbcode .= "- [color=".$bbcode_o."]Métal : [/color]";
             }
             if($bbcode_r=='') {
-                $bbcode .= $val." : ";
+                $bbcode .= $maxvalue['m']." : ";
             } else {
-                $bbcode .= "[color=".$bbcode_r."]".$val."[/color] : ";
+                $bbcode .= "[color=".$bbcode_r."]".number_format($maxvalue['m'], 0, ',', ' ')."[/color] : ";
             }
             if($bbcode_l=='') {
-                $bbcode .= $production_joueur[$key]."[/color]\n";
+                $bbcode .= $production_joueur[$maxvalue['i']]."[/color]\n";
             } else {
-                $bbcode .= "[color=".$bbcode_l."]".$production_joueur[$key]."[/color]\n";
+                $bbcode .= "[color=".$bbcode_l."]".$production_joueur[$maxvalue['i']]."[/color]\n";
             }
 
-            arsort($production_cristal);	
-            list($key,$val) = each($production_cristal);
+            $maxvalue = doublemax($production_cristal);
             if($bbcode_o=='') {
                 $bbcode .= "- Cristal : ";
             } else {
                 $bbcode .= "- [color=".$bbcode_o."]Cristal : [/color]";
             }
             if($bbcode_r=='') {
-                $bbcode .= $val." : ";
+                $bbcode .= $maxvalue['m']." : ";
             } else {
-                $bbcode .= "[color=".$bbcode_r."]".$val."[/color] : ";
+                $bbcode .= "[color=".$bbcode_r."]".number_format($maxvalue['m'], 0, ',', ' ')."[/color] : ";
             }
             if($bbcode_l=='') {
-                $bbcode .= $production_joueur[$key]."[/color]\n";
+                $bbcode .= $production_joueur[$maxvalue['i']]."[/color]\n";
             } else {
-                $bbcode .= "[color=".$bbcode_l."]".$production_joueur[$key]."[/color]\n";
+                $bbcode .= "[color=".$bbcode_l."]".$production_joueur[$maxvalue['i']]."[/color]\n";
             }
 
-            arsort($production_deuterium);
-            list($key,$val) = each($production_deuterium);
+            $maxvalue = doublemax($production_deuterium);
+            // arsort($production_deuterium);
+            // list($key,$val) = each($production_deuterium);
             if($bbcode_o=='') {
                 $bbcode .= "- Deutérium : ";
             } else {
                 $bbcode .= "- [color=".$bbcode_o."]Deutérium : [/color]";
             }
             if($bbcode_r=='') {
-                $bbcode .= $val." : ";
+                $bbcode .= $maxvalue['m']." : ";
             } else {
-                $bbcode .= "[color=".$bbcode_r."]".$val."[/color] : ";
+                $bbcode .= "[color=".$bbcode_r."]".number_format($maxvalue['m'], 0, ',', ' ')."[/color] : ";
             }
             if($bbcode_l=='') {
-                $bbcode .= $production_joueur[$key]."[/color]\n";
+                $bbcode .= $production_joueur[$maxvalue['i']]."[/color]\n";
             } else {
-                $bbcode .= "[color=".$bbcode_l."]".$production_joueur[$key]."[/color]\n";
+                $bbcode .= "[color=".$bbcode_l."]".$production_joueur[$maxvalue['i']]."[/color]\n";
             }
             
             arsort(${'production_total'});
