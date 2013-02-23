@@ -83,9 +83,9 @@
                 $production_SAT = ($row['Sat_percentage'] / 100) * floor(production_sat($row['temperature_min'], $row['temperature_max'], $off_ingenieur )) * $row['Sat'];
                 $prod_energie   = $production_CES + $production_CEF + $production_SAT;
 
-                $consommation_M = ($row['M_percentage'] / 100) * floor(consumption("M", $row['M']));
-                $consommation_C = ($row['C_percentage'] / 100) * floor(consumption("C", $row['C']));
-                $consommation_D = ($row['D_percentage'] / 100) * floor(consumption("D", $row['D']));
+                $consommation_M = ($row['M_percentage'] / 100) * ceil(consumption("M", $row['M']));
+                $consommation_C = ($row['C_percentage'] / 100) * ceil(consumption("C", $row['C']));
+                $consommation_D = ($row['D_percentage'] / 100) * ceil(consumption("D", $row['D']));
                 $cons_energie   = $consommation_M + $consommation_C + $consommation_D;
 
                 if ($cons_energie == 0) {
@@ -95,12 +95,12 @@
                 if ($ratio > 1) {
                     $ratio = 1;
                 }
-                $metal_heure   = $metal_heure   + (production("M", $row['M'], $off_geologue,0,0,$plasma) * $ratio);
-                $cristal_heure = $cristal_heure + (production("C", $row['C'], $off_geologue,0,0,$plasma) * $ratio);
-                $deut_heure    = $deut_heure    + (production("D", $row['D'], $off_geologue, $row['temperature_max']) * $ratio);
+                $metal_heure   = $metal_heure   + floor((production("M", $row['M'], $off_geologue,0,0,$plasma) * $ratio));
+                $cristal_heure = $cristal_heure + floor((production("C", $row['C'], $off_geologue,0,0,$plasma) * $ratio));
+                $deut_heure    = $deut_heure    + floor((production("D", $row['D'], $off_geologue, $row['temperature_max']) * $ratio));
                 $deut_heure    = $deut_heure - (floor(consumption("CEF", $row['CEF']) * $row['CEF_percentage'] / 100));
 
-//echo '<p><b>'.$row['planet_name'].'</b><br />';
+// echo '<p><b>'.$row['planet_name'].'</b><br />';
 // echo 'CES='.$production_CES.' CEF='.$production_CEF.' SAT='.$production_SAT;
 // echo ' cons_M='.$consommation_M.' cons_C='.$consommation_C.' cons_D='.$consommation_D;
 // echo ' ratio='.$ratio.'<br />';
@@ -454,4 +454,19 @@
         return $tmp[0];
     }
 
+    /**
+     * (Matlab max), find highest value of an array and return also the index.
+     *
+     * @param   associative array
+     * @return  array ('m'=>highest_value, 'i'=>its index)
+     */
+    function doublemax($mylist){
+        $maxvalue = max($mylist);
+        while(list($key, $value) = each($mylist)) {
+            if($value == $maxvalue) {
+                $maxindex = $key;
+            }
+        }
+        return array("m"=>$maxvalue,"i"=>$maxindex);
+    }
 ?>
