@@ -1,11 +1,13 @@
 <?php
 /* ***************************************************************************** *
- *	Filename      :  bt_hof.php Version 0.5
+ *	Filename      :  bt_hof.php Version 1.0
  *	Author        :  erikosan / Savinien Cyrano (Univers 14)
  *	Contributor   :  lithie / Shad0w /Pitch314
  *	Mod OGSpy     :  Building & Techno HOF
  *  Modifications :
- *   - 11/02/2013 par Picth314 : reformatage et correction erreur html
+ *   - 11/02/2013 par Pitch314 : reformatage et correction erreur html
+ *   - 23/02/2013 par Pitch314 : Optimation pour trouver un max et ajout du tableau
+ *                      de production dans le bbcode.                
  * **************************************************************************** */
 	
 /* ************************************************************************* *
@@ -21,7 +23,7 @@
  * Gère le fonctionnement du mod "Building & Techno HOF" qui permet de faire des
  * HOF Bâtiments/Recherche/Défense et un classement de la production minière.
  *
- * @version 11-02-2013, v0.6
+ * @version 11-02-2013, v1.0
  * @author  erikosan / Savinien Cyrano
  *
  */
@@ -236,15 +238,18 @@
             break;
 
         case "Defense" : // Page Défense
-            Create_HOF($Def_name,$Def_label,$Def_icon,"Défense","user_defence",7,$affichage);
+            Create_HOF($Def_name, $Def_label, $Def_icon, "Défense", 
+                       "user_defence", 7, $affichage);
             break;
         case "Production" : //Page production minière
-            $type_production = Array( Array ( 'titre'=>'jour' , 'x'=>1 ) , Array ( 'titre'=>'semaine' , 'x'=>7 ) );
+            $type_production = Array( Array( 'titre'=>'jour', 'x'=>1 ) , Array( 'titre'=>'semaine' , 'x'=>7 ) );
             
             Create_Mine_HOF();
             
             // Page de production de {$pub_mine}
-            arsort(${'production_'.$pub_mine});
+            if (is_array(${'production_'.$pub_mine})) { //Cas où personne n'a de bâtiment dans la bdd
+                arsort(${'production_'.$pub_mine});
+            }
             foreach($type_production as $tbl) {
 ?>
                 <table style='width : 60%; text-align : center; margin-bottom : 20px;'>
@@ -256,9 +261,14 @@
                     <td class='c' style='width : 18%;'><a href='index.php?action=bt_hof&amp;subaction=Production&amp;mine=total'>Total</a></td>
                 </tr>
 <?php
-                $valid_pub_mine = Array ('metal','cristal','deuterium','total');
+                $valid_pub_mine = Array('metal', 'cristal', 'deuterium', 'total');
                 if(!in_array($pub_mine,$valid_pub_mine)) {
                     $pub_mine = 'total';
+                }
+
+                if (!is_array(${'production_'.$pub_mine})) {
+                    echo '</table>';
+                    continue;
                 }
 
                 $nb = 1;
@@ -272,7 +282,6 @@
                         <td style='background-color : #273234;'><font color='green'><b><?php echo number_format($production_deuterium[$key]*$tbl['x'], 0, ',', ' '); ?></b></font></td>
                         <td style='background-color : #273234;'><font color='grey'><?php echo number_format($production_total[$key]*$tbl['x'], 0, ',', ' '); ?></font></td>
                     </tr>
-
 <?php 
                     $nb++;
                 }
@@ -281,99 +290,32 @@
             break;
 
         case "BBCode" : // Création  de la page BBCode
+            echo "<p style='background-color : #273234;font-size : 18;'><font color='red'><b>Attention utilisation de la balise [table], pour le tableau des productions. (Tout les forums n'acceptent pas cette balise.)</b></font></p>\n";
             Get_BBCode();
 
             $bbcode .= "[b][color=".$bbcode_t."]Bâtiments[/color][/b]\n\n";
-            $bbcode .= HOF_bbcode($Building_Name,$Building_Label,"Bâtiments","user_building",$number,$bbcode_o,$bbcode_r,$bbcode_l);
+            $bbcode .= HOF_bbcode($Building_Name, $Building_Label, "Bâtiments",
+                            "user_building", $number, $bbcode_o, $bbcode_r, 
+                            $bbcode_l);
 
             $bbcode .= "\n\n[b][color=".$bbcode_t."]Flottes[/color][/b]\n\n";
-            $bbcode .= HOF_bbcode($Flottes_Name,$Flottes_Label,"Flottes","bthof_flottes",13,$bbcode_o,$bbcode_r,$bbcode_l);
+            $bbcode .= HOF_bbcode($Flottes_Name, $Flottes_Label, "Flottes",
+                            "bthof_flottes", 13, $bbcode_o, $bbcode_r, $bbcode_l);
 
             $bbcode .= "\n\n[b][color=".$bbcode_t."]Technologies[/color][/b]\n\n";
-            $bbcode .= HOF_bbcode($Tech_name,$Tech_label,"Technologies","user_technology",15,$bbcode_o,$bbcode_r,$bbcode_l);
+            $bbcode .= HOF_bbcode($Tech_name, $Tech_label, "Technologies",
+                            "user_technology", 15, $bbcode_o, $bbcode_r,
+                            $bbcode_l);
 
             $bbcode .= "\n\n[b][color=".$bbcode_t."]Défense[/color][/b]\n\n";
-            $bbcode .= HOF_bbcode($Def_name,$Def_label,"Défense","user_defence",7,$bbcode_o,$bbcode_r,$bbcode_l);
+            $bbcode .= HOF_bbcode($Def_name, $Def_label, "Défense",
+                            "user_defence", 7, $bbcode_o, $bbcode_r, $bbcode_l);
 
             $bbcode .= "\n\n[b][color=".$bbcode_t."]Production par jour[/color][/b]\n\n";
-
             Create_Mine_HOF();
-            
-            $maxvalue = doublemax($production_metal);
-            if($bbcode_o=='') {
-                $bbcode .= "- Métal : ";
-            } else {
-                $bbcode .= "- [color=".$bbcode_o."]Métal : [/color]";
-            }
-            if($bbcode_r=='') {
-                $bbcode .= $maxvalue['m']." : ";
-            } else {
-                $bbcode .= "[color=".$bbcode_r."]".number_format($maxvalue['m'], 0, ',', ' ')."[/color] : ";
-            }
-            if($bbcode_l=='') {
-                $bbcode .= $production_joueur[$maxvalue['i']]."[/color]\n";
-            } else {
-                $bbcode .= "[color=".$bbcode_l."]".$production_joueur[$maxvalue['i']]."[/color]\n";
-            }
-
-            $maxvalue = doublemax($production_cristal);
-            if($bbcode_o=='') {
-                $bbcode .= "- Cristal : ";
-            } else {
-                $bbcode .= "- [color=".$bbcode_o."]Cristal : [/color]";
-            }
-            if($bbcode_r=='') {
-                $bbcode .= $maxvalue['m']." : ";
-            } else {
-                $bbcode .= "[color=".$bbcode_r."]".number_format($maxvalue['m'], 0, ',', ' ')."[/color] : ";
-            }
-            if($bbcode_l=='') {
-                $bbcode .= $production_joueur[$maxvalue['i']]."[/color]\n";
-            } else {
-                $bbcode .= "[color=".$bbcode_l."]".$production_joueur[$maxvalue['i']]."[/color]\n";
-            }
-
-            $maxvalue = doublemax($production_deuterium);
-            // arsort($production_deuterium);
-            // list($key,$val) = each($production_deuterium);
-            if($bbcode_o=='') {
-                $bbcode .= "- Deutérium : ";
-            } else {
-                $bbcode .= "- [color=".$bbcode_o."]Deutérium : [/color]";
-            }
-            if($bbcode_r=='') {
-                $bbcode .= $maxvalue['m']." : ";
-            } else {
-                $bbcode .= "[color=".$bbcode_r."]".number_format($maxvalue['m'], 0, ',', ' ')."[/color] : ";
-            }
-            if($bbcode_l=='') {
-                $bbcode .= $production_joueur[$maxvalue['i']]."[/color]\n";
-            } else {
-                $bbcode .= "[color=".$bbcode_l."]".$production_joueur[$maxvalue['i']]."[/color]\n";
-            }
-            
-            arsort(${'production_total'});
-            $bbcode .= "\n\n[b][color=".$bbcode_t."]Classement production minière :[/color][/b]\n\n";
-
-            $bbcode .= '[table cellspacing="2"]'."\n";
-            $bbcode .= '[tr][td colspan="2"][color=#ff00ff][b]Production par jour[/b][/color][/td]';
-            $bbcode .= '[td][color=#00ffff][b]Métal[/b][/color][/td]';
-            $bbcode .= '[td][color=#00ffff][b]Cristal[/b][/color][/td]';
-            $bbcode .= '[td][color=#00ffff][b]Deutérium[/b][/color][/td]';
-            $bbcode .= '[td align="center"][b]Total[/b][/td][/tr]'."\n";
-            
-            $nb = 1;
-            foreach (${'production_total'} as $key => $val) {
-                $bbcode .= '[tr][td][color=white][b]'.$nb.'[/b][/color][/td]';
-                $bbcode .= '[td]'.$production_joueur[$key].'[/td]';
-                $bbcode .= '[td align="right"][color=red][b]'.number_format($production_metal[$key], 0, ',', ' ').'[/b][/color][/td]';
-                $bbcode .= '[td align="right"][color=lightblue][b]'.number_format($production_cristal[$key], 0, ',', ' ').'[/b][/color][/td]';
-                $bbcode .= '[td align="right"][color=green][b]'.number_format($production_deuterium[$key], 0, ',', ' ').'[/b][/color][/td]';
-                $bbcode .= '[td align="right"][color=grey]'.number_format($production_total[$key], 0, ',', ' ').'[/color][/td][/tr]'."\n";
-                
-                $nb++;
-            }
-            $bbcode .= "[/table]\n";
+            Mine_HOF_bbcode($production_metal, $production_cristal, $production_deuterium, 
+                            $production_total, $production_joueur, 
+                            $bbcode_o, $bbcode_r, $bbcode_l);
 ?>
             <textarea rows='25' cols='15' style='border : 3px ridge silver; padding : 10px; font-size : 12px;' id='bbcode3'>
                 <?php echo $bbcode; ?>
