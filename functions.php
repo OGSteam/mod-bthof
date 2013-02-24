@@ -1,4 +1,14 @@
 <?php
+/* ***************************************************************************** *
+ *	Filename      :  function.php Version 1.0
+ *	Author        :  erikosan / Savinien Cyrano (Univers 14)
+ *	Contributor   :  Pitch314
+ *	Mod OGSpy     :  Building & Techno HOF
+ *  Modifications :
+ *   - 11/02/2013 par Pitch314 : reformatage et correction erreur html
+ *   - 23/02/2013 par Pitch314 : Optimation HOF production.                
+ * **************************************************************************** */
+ 
 /** $Id: functions.php  2008-03-08  ericc $ **/
 /**
 * @file functions.php
@@ -6,10 +16,10 @@
 * functions.php Défini les fonctions du mod
 *
 * @package [MOD] bt_hof
-* @author  erikosan / Savinien Cyrano (Univers 14) 
-* @version 0.6a
-*	created  : ??/??/2007
-*	modified : 11/02/2013
+* @author  erikosan / Savinien Cyrano (Univers 14)
+* @created 2007
+* @version 1.0
+* @modified 23/02/2013
 */
     // On véréfie que le dépôt de ravitaillement fait activer sur l'univers.
     $ddr = $server_config['ddr'];
@@ -57,7 +67,7 @@
             
             list($user_id, $user_name, $off_ingenieur, $off_geologue, $NRJ, $plasma) = $player;
             $nb_planet = find_real_nb_planete_user($user_id);
-//echo $user_name.' ing '.$off_ingenieur.' geo '.$off_geologue.' nrj '.$NRJ.' plasma '.$plasma.'<br />';
+// echo $user_name.' ing '.$off_ingenieur.' geo '.$off_geologue.' nrj '.$NRJ.' plasma '.$plasma.'<br />';
             if ($nb_planet == 0) { //Si le joueur n'a pas de planète encore répertoriée
                 continue;
             } 
@@ -117,16 +127,20 @@
             
             $nplayer ++;
         } //Fin boucle joueur
-        mysql_free_result($quet);
-        mysql_free_result($result);
+        if ($quet != NULL) {
+            mysql_free_result($quet);
+        }
+        if ($result) {
+            mysql_free_result($result);
+        }
         return $nplayer;
     }
 
     // ===========================================
     // = Calcul du classement pour une catégorie =
     // ===========================================//
-    function Create_HOF ($Table_name, $Table_label, $Table_icon, $Title,
-                         $OGSpy_Table, $NbItems, $affich)
+    function Create_HOF($Table_name, $Table_label, $Table_icon, $Title,
+                        $OGSpy_Table, $NbItems, $affich)
     {
         if (!isset ($table_prefix)) { global $table_prefix; }
         if (!isset ($db))           { global $db; }
@@ -172,7 +186,8 @@
 
             $val = -1;
             $premiere_fois = 0;
-            while ($row = mysql_fetch_array($result, MYSQL_NUM))
+            //while ($row = mysql_fetch_array($result, MYSQL_NUM))
+            while ($row = $db->sql_fetch_row($result))
             {
                 $val = $row[0];
                 if ($val == 0) {
@@ -234,6 +249,7 @@
             }
             echo '</td>' . "\n\t\t\t" . '</tr>';
             mysql_free_result($result);
+            mysql_free_result($result2);
         }
         echo "\n\t\t" . '</table>';
         return 1;
@@ -242,8 +258,8 @@
     // ================================
     // = Creation de la chaine BBcode =
     // ================================//
-
-    function HOF_bbcode ($Table_name,$Table_label,$Title,$OGSpy_Table,$NbItems,$b1,$b2,$b3)
+    function HOF_bbcode($Table_name, $Table_label, $Title, $OGSpy_Table, $NbItems,
+                        $b1, $b2, $b3)
     {
         if (!isset($table_prefix)) { global $table_prefix; }
         if (!isset($db))           { global $db; }
@@ -260,7 +276,8 @@
             $premiere_fois = 0;
             $bbcode .= "";
 
-            while ($row = mysql_fetch_array($result, MYSQL_NUM)) 
+            //while ($row = mysql_fetch_array($result, MYSQL_NUM))
+            while ($row = $db->sql_fetch_row($result))
             {
                 $val = $row[0];
                 if($premiere_fois != 0)
@@ -299,6 +316,92 @@
 		return "";
 	}
 
+    function Mine_HOF_bbcode($prod_metal, $prod_cristal, $prod_deuterium, 
+                             $prod_total, $prod_joueur, $b1, $b2, $b3)
+    {
+        if (!isset($bbcode))       { global $bbcode; }
+        
+        if (!is_array($prod_metal)) {
+            return "";
+        }
+        
+        $maxvalue = doublemax($prod_metal);
+        if($b1=='') {
+            $bbcode .= "- Métal : ";
+        } else {
+            $bbcode .= "- [color=".$b1."]Métal : [/color]";
+        }
+        if($b2=='') {
+            $bbcode .= number_format($maxvalue['m'], 0, ',', ' ')." : ";
+        } else {
+            $bbcode .= "[color=".$b2."]".number_format($maxvalue['m'], 0, ',', ' ')."[/color] : ";
+        }
+        if($b3=='') {
+            $bbcode .= $prod_joueur[$maxvalue['i']]."[/color]\n";
+        } else {
+            $bbcode .= "[color=".$b3."]".$prod_joueur[$maxvalue['i']]."[/color]\n";
+        }
+
+        $maxvalue = doublemax($prod_cristal);
+        if($b1=='') {
+            $bbcode .= "- Cristal : ";
+        } else {
+            $bbcode .= "- [color=".$b1."]Cristal : [/color]";
+        }
+        if($b2=='') {
+            $bbcode .= number_format($maxvalue['m'], 0, ',', ' ')." : ";
+        } else {
+            $bbcode .= "[color=".$b2."]".number_format($maxvalue['m'], 0, ',', ' ')."[/color] : ";
+        }
+        if($b3=='') {
+            $bbcode .= $prod_joueur[$maxvalue['i']]."[/color]\n";
+        } else {
+            $bbcode .= "[color=".$b3."]".$prod_joueur[$maxvalue['i']]."[/color]\n";
+        }
+
+        $maxvalue = doublemax($prod_deuterium);
+        // arsort($prod_deuterium);
+        // list($key,$val) = each($prod_deuterium);
+        if($b1=='') {
+            $bbcode .= "- Deutérium : ";
+        } else {
+            $bbcode .= "- [color=".$b1."]Deutérium : [/color]";
+        }
+        if($b2=='') {
+            $bbcode .= number_format($maxvalue['m'], 0, ',', ' ')." : ";
+        } else {
+            $bbcode .= "[color=".$b2."]".number_format($maxvalue['m'], 0, ',', ' ')."[/color] : ";
+        }
+        if($b3=='') {
+            $bbcode .= $prod_joueur[$maxvalue['i']]."[/color]\n";
+        } else {
+            $bbcode .= "[color=".$b3."]".$prod_joueur[$maxvalue['i']]."[/color]\n";
+        }
+        
+        arsort($prod_total);
+        $bbcode .= "\n\n[b][color=".$bbcode_t."]Classement production minière :[/color][/b]\n";
+
+        $bbcode .= '[table cellspacing="2"]'."\n";
+        $bbcode .= '[tr][td colspan="2"][color=#ff00ff][b]Production par jour[/b][/color][/td]';
+        $bbcode .= '[td][color=#00ffff][b]Métal[/b][/color][/td]';
+        $bbcode .= '[td][color=#00ffff][b]Cristal[/b][/color][/td]';
+        $bbcode .= '[td][color=#00ffff][b]Deutérium[/b][/color][/td]';
+        $bbcode .= '[td align="center"][b]Total[/b][/td][/tr]'."\n";
+        
+        $nb = 1;
+        foreach ($prod_total as $key => $val) {
+            $bbcode .= '[tr][td][color=white][b]'.$nb.'[/b][/color][/td]';
+            $bbcode .= '[td]'.$prod_joueur[$key].'[/td]';
+            $bbcode .= '[td align="right"][color=red][b]'.number_format($prod_metal[$key], 0, ',', ' ').'[/b][/color][/td]';
+            $bbcode .= '[td align="right"][color=lightblue][b]'.number_format($prod_cristal[$key], 0, ',', ' ').'[/b][/color][/td]';
+            $bbcode .= '[td align="right"][color=green][b]'.number_format($prod_deuterium[$key], 0, ',', ' ').'[/b][/color][/td]';
+            $bbcode .= '[td align="right"][color=grey]'.number_format($prod_total[$key], 0, ',', ' ').'[/color][/td][/tr]'."\n";
+            
+            $nb++;
+        }
+        $bbcode .= "[/table]\n";
+    
+    }
     // =================================
     // = Sauvegarde des valeurs BBCode =
     // =================================
@@ -310,7 +413,8 @@
         if (!isset($bbcode_r)) { global $bbcode_r; }
         if (!isset($bbcode_l)) { global $bbcode_l; }
         
-        $request = "UPDATE ".TABLE_BTHOF_CONF." SET bbcode_t='$bbcode_1',bbcode_o='$bbcode_2',bbcode_r='$bbcode_3',bbcode_l='$bbcode_4'";
+        $request = "UPDATE ".TABLE_BTHOF_CONF.
+                  " SET bbcode_t='$bbcode_1', bbcode_o='$bbcode_2', bbcode_r='$bbcode_3', bbcode_l='$bbcode_4'";
         $result = $db->sql_query($request);
 
         $bbcode_t = $bbcode_1;
@@ -374,7 +478,7 @@
     {
         global $db;
         $sql = 'DELETE FROM ' . TABLE_BTHOF_FLOTTES . '';
-        $resultat = mysql_query ($sql);
+        $resultat = mysql_query($sql);
             
         // Controle de l'existance du mod flotte et de son activation.
         /* inutile maintenant puisque appelé seulement par la page flotte quand le mod est installé
@@ -384,8 +488,8 @@
         if ($modflotte[0] == "1")
           {*/
           // Je suis quasiment sur qu'on peux faire sans cette table ... à voir !!
-        $req = mysql_query ("SELECT SUM(PT) as PT, SUM(GT) AS GT, SUM(CLE) AS CLE, SUM(CLO) AS CLO, SUM(CR) AS CR, SUM(VB) AS VB, SUM(VC) AS VC, SUM(REC) AS REC, SUM(SE) AS SE, SUM(BMD) AS BMD, SUM(DST) AS DST, SUM(EDLM) AS EDLM, SUM(TRA) AS TRA, SUM(SAT) AS SAT,user_id FROM ".TABLE_FLOTTES." GROUP BY user_id");
-        while($resultat = mysql_fetch_array ($req))
+        $req = mysql_query("SELECT SUM(PT) as PT, SUM(GT) AS GT, SUM(CLE) AS CLE, SUM(CLO) AS CLO, SUM(CR) AS CR, SUM(VB) AS VB, SUM(VC) AS VC, SUM(REC) AS REC, SUM(SE) AS SE, SUM(BMD) AS BMD, SUM(DST) AS DST, SUM(EDLM) AS EDLM, SUM(TRA) AS TRA, SUM(SAT) AS SAT,user_id FROM ".TABLE_FLOTTES." GROUP BY user_id");
+        while($resultat = mysql_fetch_array($req))
         {
             $resultat = "INSERT INTO ".TABLE_BTHOF_FLOTTES." (user_id, PT, GT, CLE, CLO, CR, VB, VC, REC, SE, BMD, DST, EDLM, TRA, SAT) VALUES ('$resultat[user_id]', '$resultat[PT]', '$resultat[GT]', '$resultat[CLE]', '$resultat[CLO]', '$resultat[CR]', '$resultat[VB]', '$resultat[VC]', '$resultat[REC]', '$resultat[SE]', '$resultat[BMD]', '$resultat[DST]', '$resultat[EDLM]', '$resultat[TRA]', '$resultat[SAT]')";
             $resultat = mysql_query($resultat);
@@ -403,7 +507,7 @@
         if(function_exists('curl_init')) {
         // Version php 4.x supported
             $handle   = curl_init($url);
-            if (false === $handle)
+            if (false == $handle)
             {
                 return false;
             }
@@ -438,6 +542,12 @@
         }
     }
     
+    /**
+     * Find the number of planet of an user.
+     *
+     * @param   user id in database
+     * @return  the number of planet
+     */
     function find_real_nb_planete_user($user_id)
     {
         global $db;
@@ -448,8 +558,8 @@
         $request .= " AND planet_id < 199 ";
         $request .= " ORDER BY planet_id";
         
-        $result = $db->sql_query($request);
-        
+        $result = $db->sql_query($request); 
+      //result is alway an (1,1)array even if user_id doesn't exist
         $tmp = $db->sql_fetch_row();
         return $tmp[0];
     }
@@ -461,6 +571,9 @@
      * @return  array ('m'=>highest_value, 'i'=>its index)
      */
     function doublemax($mylist){
+        if (!is_array($mylist)) {
+            return NULL;
+        }
         $maxvalue = max($mylist);
         while(list($key, $value) = each($mylist)) {
             if($value == $maxvalue) {
