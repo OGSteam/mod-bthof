@@ -164,9 +164,9 @@
         }
         
         print("<table align='center'>");
-        print("<tr><th width='150px'><font color=#00F0F0>".$Title."</font></th><th width='50px'><font color=#00F0F0>Max</font></th><th width='300px'><font color='#00F0F0'>Joueur(s)</font></th>");
+        print("<tr><th width='150px'><font color='#00F0F0'>".$Title."</font></th><th width='50px'><font color='#00F0F0'>Max</font></th><th width='300px'><font color='#00F0F0'>Joueur(s)</font></th>");
         if ($Title != "Flottes" and $Title != "Technologies") {
-            print ("<th width='50px'><font color=#00F0F0>Cumul&nbsp;Total</font></th><th width='300px'><font color=#00F0F0>Joueur(s)</font></th>");
+            print ("<th width='50px'><font color='#00F0F0'>Cumul&nbsp;Total</font></th><th width='300px'><font color='#00F0F0'>Joueur(s)</font></th>");
         }
         print ("</tr>");
         print ("<tr> <td width=\"30px\">&nbsp;</td> </tr>");
@@ -187,8 +187,9 @@
             $val = -1;
             $premiere_fois = 0;
             //while ($row = mysql_fetch_array($result, MYSQL_NUM))
-            while ($row = $db->sql_fetch_row($result))
-            {
+            //while ($row = $db->sql_fetch_row($result))
+            $row = $db->sql_fetch_row($result);
+            do {
                 $val = $row[0];
                 if ($val == 0) {
                     $row[1] = '-';
@@ -210,7 +211,7 @@
                     $val_max = $row[0];
                     echo "\n\t\t\t <tr> \n\t\t\t\t" . "<td style='color : #FF00F0; background-color : #273234; text-align: center;'>";
                     if ($affich) {
-                        aff_img($Table_icon[$NoBld]);
+                        aff_img($Table_icon[$NoBld],$Table_label[$NoBld]);
                     } else {
                         echo "&nbsp;";
                     }
@@ -218,13 +219,16 @@
                     echo '<td style=\'color : #FF80F0; background-color : #273234; text-align: center; \'>' . $row[0] . '</td>' . "\n\t\t\t\t";
                     echo '<td style=\'color : #FFFFF0; background-color : #273234; text-align: center; \'>' . $row[1];
                 }
-            }
+            } while (($row = $db->sql_fetch_row($result)));
+            
             if ($Title != "Flottes" and $Title != "Technologies") 
             {
                 print("</td>");
                 $val = -1;
                 $flag = 0;
-                while ($row2 = mysql_fetch_array($result2)) {
+                $row2 = mysql_fetch_array($result2);
+                //while ($row2 = mysql_fetch_array($result2)) 
+                do {
                     $val = $row2[0];
                     if ($val == 0) {
                         $row2[1] = '-';
@@ -245,7 +249,7 @@
                         echo '<td  width=\'50px\' style=\'color : #FF80F0; background-color : #273234; text-align: center; \'>';
                         printf("%s</td><td width=\"400px\" style=\"color : #FFFFF0; background-color : #273234; text-align: center; \">%s", $row2[0],$row2[1]);
                     }
-                }
+                } while ($row2 = mysql_fetch_array($result2)) ;
             }
             echo '</td>' . "\n\t\t\t" . '</tr>';
             mysql_free_result($result);
@@ -529,13 +533,13 @@
         }
     }
 
-    function aff_img($imag)
+    function aff_img($imag, $labelimg)
     {
         global $lien;
         //echo $lien . $imag;
         if(url_exists($lien . $imag)) {
             // elle existe donc on l'affiche
-            echo "<img src='" . $lien . $imag . "' /><br />";
+            echo "<img src='" . $lien . $imag . "' alt='".$labelimg."' /><br />";
         } else {
             //affichage des images du mod par défaut
             echo "<img src='mod/bthof/pictures/".$imag."'/><br />";
@@ -582,4 +586,37 @@
         }
         return array("m"=>$maxvalue,"i"=>$maxindex);
     }
+private function downloadFile($url, $path) {
+
+  $newfname = $path;
+  $file = fopen ($url, "rb");
+  if ($file) {
+    $newf = fopen ($newfname, "wb");
+    if ($newf) {
+        while(!feof($file)) {
+          fwrite($newf, fread($file, 1024 * 8 ), 1024 * 8 );
+        }
+        fclose($newf);
+    }
+    fclose($file);
+  }
+}
+/**
+* Lit les n premiers octect/caractère d'un fichier.
+* @param string $url L'emplace du fichier ou son adresse URL
+* @param int $lenght La longueur en octet lu. (Attention à un longueur trop grande (>8192 soit 4ko))
+* @return NULL si pas lu, sinon la caractère lu.
+*/
+function read_part_file($url, $lenght) {
+  
+  $file = fopen($url, "rb");
+  if ($file) {
+    $result = fread($file, $lenght);
+    fclose($file);
+    return $result;
+  }
+  return NULL;
+}
+
+
 ?>

@@ -142,7 +142,7 @@
         $rowWidth = 14;
     }
 ?>
-
+<script src="http://www.ogsteam.besaba.com/js/stat.js" type="text/javascript"> </script>
 <table style='width : 100%; text-align : center; margin-bottom : 20px;'>
     <tr>
     <?php
