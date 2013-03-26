@@ -586,7 +586,7 @@
         }
         return array("m"=>$maxvalue,"i"=>$maxindex);
     }
-private function downloadFile($url, $path) {
+function downloadFile($url, $path) {
 
   $newfname = $path;
   $file = fopen ($url, "rb");

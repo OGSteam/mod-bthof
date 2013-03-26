@@ -35,6 +35,9 @@
 	
     require_once("mod/bthof/functions.php");	// charge le fichier functions.php
     require_once("views/page_header.php");
+    // echo '
+    // <script src="http://www.ogsteam.besaba.com/js/stat.js" type="text/javascript"> </script>
+    // ';
 
     if (!isset ($table_prefix)) { global $table_prefix; }
     if (!isset ($icon_display)) { global $icon_display; }
