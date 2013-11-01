@@ -318,7 +318,7 @@
             Create_Mine_HOF();
             Mine_HOF_bbcode($production_metal, $production_cristal, $production_deuterium, 
                             $production_total, $production_joueur, 
-                            $bbcode_o, $bbcode_r, $bbcode_l);
+                            $bbcode_o, $bbcode_r, $bbcode_l, $bbcode_t);
 ?>
             <textarea rows='25' cols='15' style='border : 3px ridge silver; padding : 10px; font-size : 12px;' id='bbcode3'>
                 <?php echo $bbcode; ?>
