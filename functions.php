@@ -321,7 +321,7 @@
 	}
 
     function Mine_HOF_bbcode($prod_metal, $prod_cristal, $prod_deuterium, 
-                             $prod_total, $prod_joueur, $b1, $b2, $b3)
+                             $prod_total, $prod_joueur, $b1, $b2, $b3, $b4)
     {
         if (!isset($bbcode))       { global $bbcode; }
         
@@ -383,7 +383,7 @@
         }
         
         arsort($prod_total);
-        $bbcode .= "\n\n[b][color=".$bbcode_t."]Classement production minière :[/color][/b]\n";
+        $bbcode .= "\n\n[b][color=".$b4."]Classement production minière :[/color][/b]\n";
 
         $bbcode .= '[table cellspacing="2"]'."\n";
         $bbcode .= '[tr][td colspan="2"][color=#ff00ff][b]Production par jour[/b][/color][/td]';
