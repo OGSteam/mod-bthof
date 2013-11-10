@@ -1,20 +1,22 @@
 <?php
 /* ***************************************************************************** *
- *	Filename      :  bt_hof.php Version 1.0
+ *	Filename      :  bt_hof.php Version 1.1
  *	Author        :  erikosan / Savinien Cyrano (Univers 14)
  *	Contributor   :  lithie / Shad0w /Pitch314
  *	Mod OGSpy     :  Building & Techno HOF
  *  Modifications :
- *   - 11/02/2013 par Pitch314 : reformatage et correction erreur html
- *   - 23/02/2013 par Pitch314 : Optimation pour trouver un max et ajout du tableau
- *                      de production dans le bbcode.                
+ *   - 11/02/2013 par Pitch314 : reformatage et correction erreur HTML.
+ *   - 23/02/2013 par Pitch314 : Optimisation pour trouver un max et ajout du tableau
+ *                      de production dans le BBcode.
+ *   - 10/11/2013 par Pitch314 : Ajout de la fonctionnalité de séparation des HOF
+ *                      par groupe OGSpy.
  * **************************************************************************** */
-	
+
 /* ************************************************************************* *
  *	Le Classement fourni par ce mod concerne tous les membres actifs du serveur OGSpy.
  *	Il se base sur les données fournies dans l'onglet Empire de OGspy et fournit les HOF Bâtiments/Recherche/Défense
- *	Ce mod gère les permissions d'acces grace aux groupes d'OGSpy
- *	Il suffit pour cela de créer un groupe "bt_hof" et d'y ajouter les utilisateurs authorisés pour l'utilisation de ce mod
+ *	Ce mod gère les permissions d'accès grâce aux groupes d'OGSpy.
+ *	Il suffit pour cela de créer un groupe "bt_hof" et d'y ajouter les utilisateurs autorisés pour l'utilisation de ce mod
  *	Si AUCUN GROUPE N'EST CREE, TOUS LES MEMBRES ONT ACCES
  * ************************************************************************* */
 /**
@@ -23,7 +25,8 @@
  * Gère le fonctionnement du mod "Building & Techno HOF" qui permet de faire des
  * HOF Bâtiments/Recherche/Défense et un classement de la production minière.
  *
- * @version 11-02-2013, v1.0
+ * @version 11-10-2013, v1.1
+ * @package [MOD] bt_hof
  * @author  erikosan / Savinien Cyrano
  *
  */
@@ -31,13 +34,10 @@
         die("Hacking attempt");
     }
     // error_reporting(E_ALL);
-    
-	
+
+
     require_once("mod/bthof/functions.php");	// charge le fichier functions.php
     require_once("views/page_header.php");
-    // echo '
-    // <script src="http://www.ogsteam.besaba.com/js/stat.js" type="text/javascript"> </script>
-    // ';
 
     if (!isset ($table_prefix)) { global $table_prefix; }
     if (!isset ($icon_display)) { global $icon_display; }
@@ -45,6 +45,12 @@
     define('TABLE_BTHOF_CONF', $table_prefix . 'bthof_conf');
     define('TABLE_BTHOF_FLOTTES', $table_prefix . 'bthof_flottes');
     define('TABLE_FLOTTES', $table_prefix . 'mod_flottes');
+
+    if (!isset($pub_GroupBthof))
+	{
+        global $pub_GroupBthof;
+		$pub_GroupBthof = 0;
+	}
 
     $query = "SELECT `active` FROM `".TABLE_MOD."` WHERE `action`='bt_hof' AND `active`='1' LIMIT 1";
 	if (!$db->sql_numrows($db->sql_query($query))) {
@@ -90,7 +96,7 @@
     global $bbcode;
     global $bbbat;
 
-    $bbcode = "[color=orange][b][u]HoF Bâtiments - Flottes - Technologies - Défense - Production Miniere[/u][/b][/color]\n\n\n"; 	
+    $bbcode = "[color=orange][b][u]HoF Bâtiments - Flottes - Technologies - Défense - Production Miniere[/u][/b][/color]\n\n";
 
     $Building_Name  = array("M"            ,"C"              ,"D"                        ,"CES"                        ,"CEF"                          ,"UdR"            ,"UdN"              ,"CSp"             ,"HM"             ,"HC"               ,"HD"                    ,"CM"               ,"CC"                 ,"CD"                   ,"Lab"                     ,"Ter"         ,"Silo"             ,"BaLu"        ,"Pha"                ,"PoSa"                 ,"DdR");
     $Building_Label = array("Mine de métal","Mine de Cristal","Synthétiseur de deutérium","Centrale électrique solaire","Centrale électrique de fusion","Usine de robots","Usine de nanites ","Chantier spatial","Hangar de métal","Hangar de cristal","Réservoir de deutérium","Cachette de métal","Cachette de cristal","Cachette de deutérium","Laboratoire de recherche","Terraformeur","Silo de missiles ","Base Lunaire","Phalange de capteur","Porte de saut spatial","Dépôt de Ravitaillement");
@@ -139,19 +145,42 @@
         $rightToAdmin = false;
     }
 
-    if ($rightToAdmin) { // Determine la taille, en %, des colones du menu
+    if ($rightToAdmin) { // Determine la taille, en %, des colonnes du menu
         $rowWidth = 12;
     } else {
         $rowWidth = 14;
     }
 ?>
 <script src="http://www.ogsteam.besaba.com/js/stat.js" type="text/javascript"> </script>
+
+<form style='margin:0px;padding:0px;' action="" method="POST">
+<select name="GroupBthof" onchange="this.form.submit();">
+    <option value="0" <?php if($pub_GroupBthof == "0") echo "SELECTED" ?>>Liste des groupes de HOF (défaut:Tous)</option>
+<?php
+    $request = "SELECT group_id, group_name FROM ".TABLE_GROUP.
+               " WHERE group_name NOT IN ('bt_hof', 'Standard')";  
+    $result = $db->sql_query($request);
+   while ($group = $db->sql_fetch_row($result)) {
+     list($tmpgroup_id, $tmpgroup_name) = $group;
+     echo '<option value="'.$tmpgroup_id.'" ';
+     if ($pub_GroupBthof == $tmpgroup_id) {
+        echo "SELECTED";
+    }
+     echo " >".$tmpgroup_name."</option>\n";
+   }
+?>
+</select>
+<?php
+print_r(" : $pub_GroupBthof\n");//////////////////////////////////////////////////////////////////TEST
+?>
+</form>
+
 <table style='width : 100%; text-align : center; margin-bottom : 20px;'>
     <tr>
     <?php
 //menu Bâtiments
     if ($pub_subaction != 'Batiments'){
-        echo '<td class="c" width="'.$rowWidth.'%"><a href="index.php?action=bt_hof&amp;subaction=Batiments" style="color: lime;"';
+        echo '<td class="c" width="'.$rowWidth.'%"><a href="index.php?action=bt_hof&amp;subaction=Batiments&amp;GroupBthof='.$pub_GroupBthof.'" style="color: lime;"';
         echo '>B&acirc;timents</a></td>',"\n";
     } else {
         echo '<th width="'.$rowWidth.'%"><a';
@@ -159,7 +188,7 @@
     }
 //menu Flottes
     if ($pub_subaction != 'Flottes') {
-        echo '<td class="c" width="'.$rowWidth.'%"><a href="index.php?action=bt_hof&amp;subaction=Flottes" style="color: lime;"';
+        echo '<td class="c" width="'.$rowWidth.'%"><a href="index.php?action=bt_hof&amp;subaction=Flottes&amp;GroupBthof='.$pub_GroupBthof.'" style="color: lime;"';
         echo '>Flottes</a></td>',"\n";
     } else {
         echo '<th width="'.$rowWidth.'%"><a';
@@ -167,7 +196,7 @@
     }
 //menu techno
     if ($pub_subaction != 'Techno') { 
-        echo '<td class="c" width="'.$rowWidth.'%"><a href="index.php?action=bt_hof&amp;subaction=Techno" style="color: lime;"';
+        echo '<td class="c" width="'.$rowWidth.'%"><a href="index.php?action=bt_hof&amp;subaction=Techno&amp;GroupBthof='.$pub_GroupBthof.'" style="color: lime;"';
         echo '>Technologies</a></td>',"\n";
     } else {
         echo '<th width="'.$rowWidth.'%"><a';
@@ -175,7 +204,7 @@
     }
 //menu defense
     if ($pub_subaction != 'Defense') {
-        echo '<td class="c" width="'.$rowWidth.'%"><a href="index.php?action=bt_hof&amp;subaction=Defense" style="color: lime;"';
+        echo '<td class="c" width="'.$rowWidth.'%"><a href="index.php?action=bt_hof&amp;subaction=Defense&amp;GroupBthof='.$pub_GroupBthof.'" style="color: lime;"';
         echo '>D&eacute;fense</a></td>',"\n";
     } else {
         echo '<th width="'.$rowWidth.'%"><a';
@@ -183,7 +212,7 @@
     }
 //menu prod minière
     if ($pub_subaction != 'Production') {
-        echo '<td class="c" width="'.$rowWidth.'%"><a href="index.php?action=bt_hof&amp;subaction=Production" style="color: lime;"';
+        echo '<td class="c" width="'.$rowWidth.'%"><a href="index.php?action=bt_hof&amp;subaction=Production&amp;GroupBthof='.$pub_GroupBthof.'" style="color: lime;"';
         echo '>Prod Mini&egrave;re</a></td>',"\n";
     } else {
         echo '<th width="'.$rowWidth.'%"><a';
@@ -191,7 +220,7 @@
     }
 //menu espace bbcode
     if ($pub_subaction != 'BBCode') {
-        echo '<td class="c" width="'.$rowWidth.'%"><a href="index.php?action=bt_hof&amp;subaction=BBCode" style="color: lime;"';
+        echo '<td class="c" width="'.$rowWidth.'%"><a href="index.php?action=bt_hof&amp;subaction=BBCode&amp;GroupBthof='.$pub_GroupBthof.'" style="color: lime;"';
         echo '>BBCode</a></td>',"\n";
     } else { 
         echo '<th width="'.$rowWidth.'%"><a';
@@ -219,7 +248,7 @@
 ?>
     </tr>
 </table>
-	
+
 <?php
     if (!isset ($pub_mine)) { $pub_mine = 'total'; }
 
@@ -246,9 +275,9 @@
             break;
         case "Production" : //Page production minière
             $type_production = Array( Array( 'titre'=>'jour', 'x'=>1 ) , Array( 'titre'=>'semaine' , 'x'=>7 ) );
-            
+
             Create_Mine_HOF();
-            
+
             // Page de production de {$pub_mine}
             if (is_array(${'production_'.$pub_mine})) { //Cas où personne n'a de bâtiment dans la bdd
                 arsort(${'production_'.$pub_mine});
@@ -295,6 +324,14 @@
         case "BBCode" : // Création  de la page BBCode
             echo "<p style='background-color : #273234;font-size : 18;'><font color='red'><b>Attention utilisation de la balise [table], pour le tableau des productions. (Tout les forums n'acceptent pas cette balise.)</b></font></p>\n";
             Get_BBCode();
+            if ($pub_GroupBthof != 0) {
+                $request = "SELECT group_name FROM ".TABLE_GROUP." WHERE group_id=".$pub_GroupBthof;
+                $result  = $db->sql_query($request);
+                $group = $db->sql_fetch_row($result);
+                $bbcode .= "[i][b](Pour le groupe/alliance : $group[0])[/b][/i]\n\n\n";
+            } else {
+                $bbcode .= "\n\n";
+            }
 
             $bbcode .= "[b][color=".$bbcode_t."]Bâtiments[/color][/b]\n\n";
             $bbcode .= HOF_bbcode($Building_Name, $Building_Label, "Bâtiments",
@@ -332,7 +369,6 @@
             } else {
                 Get_Adm();
             }
-
 ?>
             <form method='post'>
                 <table style='width : 50%; text-align : center'>
@@ -600,7 +636,26 @@
                             <li>Correction pour serveur sans "Curl".</li>
                             <li>Prise en compte de la technologie plasma.</li>
                             <li>Optimisation HOF production.</li>
-                            <li>Correction et ajout au générateur de bbcode.</li>
+                            <li>Correction et ajout au générateur de BBcode.</li>
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+                    <td style='background-color : #273234; text-align : center;'>1.1.1</td>
+                    <td style='background-color : #273234;'>
+                        <i>Mise à jour par Pitch314</i>
+                        <ul>
+                            <li>Légères corrections (valeurs entières dans le BBcode, script de statistique)</li>
+                            <li>Correction du comportement/affichage s'il n'y a aucun classement/bâtiment</li>
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+                    <td style='background-color : #273234; text-align : center;'>1.1.2</td>
+                    <td style='background-color : #273234;'>
+                        <i>Mise à jour par Pitch314 (nov 2013)</i>
+                        <ul>
+                            <li>[Fonctionnalité] HOF pour un groupe d'OGSpy particulier</li>
                         </ul>
                     </td>
                 </tr>
