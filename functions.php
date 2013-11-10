@@ -1,15 +1,16 @@
 <?php
 /* ***************************************************************************** *
- *	Filename      :  function.php Version 1.0
+ *	Filename      :  function.php Version 1.1
  *	Author        :  erikosan / Savinien Cyrano (Univers 14)
  *	Contributor   :  Pitch314
  *	Mod OGSpy     :  Building & Techno HOF
  *  Modifications :
- *   - 11/02/2013 par Pitch314 : reformatage et correction erreur html
- *   - 23/02/2013 par Pitch314 : Optimation HOF production.                
+ *   - 11/02/2013 par Pitch314 : reformatage et correction erreur HTML.
+ *   - 23/02/2013 par Pitch314 : Optimisation HOF production.
+ *   - 10/11/2013 par Pitch314 : Ajout de la fonctionnalité de séparation des HOF
+ *                      par groupe OGSpy. 
  * **************************************************************************** */
- 
-/** $Id: functions.php  2008-03-08  ericc $ **/
+
 /**
 * @file functions.php
 *
@@ -18,10 +19,10 @@
 * @package [MOD] bt_hof
 * @author  erikosan / Savinien Cyrano (Univers 14)
 * @created 2007
-* @version 1.0
-* @modified 23/02/2013
+* @version 11-10-2013, v1.1
+* @modified 11/10/2013
 */
-    // On véréfie que le dépôt de ravitaillement fait activer sur l'univers.
+    // On vérifie que le dépôt de ravitaillement soit activé sur l'univers.
     $ddr = $server_config['ddr'];
     if ($ddr == 1) {
         $number ="20";
@@ -30,12 +31,12 @@
     }
 
     // ==============================================
-    // = Calcul du classement de production miniere =
+    // = Calcul du classement de production minière =
     // ==============================================//
     function Create_Mine_HOF()
     {
         require_once("includes/ogame.php");
-        
+
         if (!isset($production_metal))     { global $production_metal; }
         if (!isset($production_cristal))   { global $production_cristal; }
         if (!isset($production_deuterium)) { global $production_deuterium; }
@@ -43,22 +44,44 @@
         if (!isset($production_joueur))    { global $production_joueur; }
         if (!isset($table_prefix))         { global $table_prefix; }
         if (!isset($db))                   { global $db; }
-        
+
         $planet = array(false, 'user_id' => '', 'planet_name' => '', 'coordinates' => '',
                         'fields' => '', 'fields_used' => '', 'temperature_min' => '',
                         'temperature_max' => '', 'Sat' => '', 'M' => 0, 'C' => 0,
                         'D' => 0, 'CES' => 0, 'CEF' => 0 , 'M_percentage' => 0, 
                         'C_percentage' => 0, 'D_percentage' => 0, 'CES_percentage' => 100,
                         'CEF_percentage' => 100, 'Sat_percentage' => 100);
-        
-        $sql = "SELECT DISTINCT u.user_id,user_name,`off_ingenieur`,`off_geologue`, `NRJ`, `Plasma` ".
-               "FROM ". TABLE_USER ." u JOIN ". TABLE_USER_TECHNOLOGY ." b ".
-                    "ON u.user_id = b.user_id ".
+        global $pub_GroupBthof;
+        //print_r("group2=$pub_GroupBthof\n");//////////////////////////////////////////////////////////////////TEST
+
+        $sql = "SELECT DISTINCT a.user_id, user_name,`off_ingenieur`,`off_geologue`, `NRJ`, `Plasma` ".
+               "FROM ";
+        if ($pub_GroupBthof == 0) {
+            $sql = $sql.TABLE_USER;
+        } else {
+            $sql = $sql."(SELECT u.user_id, user_active, user_name, `off_ingenieur`,`off_geologue` ".
+                     "FROM ".TABLE_USER_GROUP." g JOIN ". TABLE_USER ." u ON u.user_id = g.user_id ".
+                     "WHERE g.group_id = ".$pub_GroupBthof.")";
+        }
+        $sql = $sql." a JOIN ".TABLE_USER_TECHNOLOGY." b ON a.user_id = b.user_id ".
                "WHERE user_active='1'";
+        //print_r("SQL=$sql\n");//////////////////////////////////////////////////////////////////TEST
+        // if ($pub_GroupBthof == 0) {
+            // $sql = "SELECT DISTINCT u.user_id,user_name,`off_ingenieur`,`off_geologue`, `NRJ`, `Plasma` ".
+                   // "FROM ". TABLE_USER ." u JOIN ". TABLE_USER_TECHNOLOGY ." b ".
+                        // "ON u.user_id = b.user_id ".
+                   // "WHERE user_active='1'";
+        // } else {
+        // $sql = "SELECT DISTINCT a.user_id, user_name,`off_ingenieur`,`off_geologue`, `NRJ`, `Plasma` ".
+               // "FROM (SELECT u.user_id, user_active, user_name, `off_ingenieur`,`off_geologue` ".
+                     // "FROM ".TABLE_USER_GROUP." g JOIN ". TABLE_USER ." u ON u.user_id = g.user_id ".
+                     // "WHERE g.group_id = ".$pub_GroupBthof.") a
+                    // JOIN ". TABLE_USER_TECHNOLOGY ." b ON a.user_id = b.user_id ".
+               // "WHERE user_active='1'";
+        // }
         $result = $db->sql_query($sql);
         $nplayer=0;
         //Début boucle sur joueur
-        // while ($player = mysql_fetch_array($result, MYSQL_NUM))
         while ($player = $db->sql_fetch_row($result))
         {
             $metal_heure   = 0;
@@ -87,7 +110,6 @@
             // while ($row = mysql_fetch_assoc($quet))
             while ($row = $db->sql_fetch_assoc($quet))
             {
-
                 $production_CES = ($row['CES_percentage'] / 100) * floor(production("CES", $row['CES'], $off_ingenieur));
                 $production_CEF = ($row['CEF_percentage'] / 100) * floor(production("CEF", $row['CEF'], $off_ingenieur, $row['temperature_max'], $NRJ));
                 $production_SAT = ($row['Sat_percentage'] / 100) * floor(production_sat($row['temperature_min'], $row['temperature_max'], $off_ingenieur )) * $row['Sat'];
@@ -124,7 +146,7 @@
             $production_cristal[$nplayer]   = 24 * $cristal_heure;
             $production_deuterium[$nplayer] = 24 * $deut_heure;
             $production_total[$nplayer]     = 24 * ($metal_heure + $cristal_heure + $deut_heure);
-            
+
             $nplayer ++;
         } //Fin boucle joueur
         if ($quet != NULL) {
@@ -146,10 +168,10 @@
         if (!isset ($db))           { global $db; }
         if (!isset ($lien))         { global $lien; }
 
-        // Controle de l'exitance du mod flottes
+        // Contrôle de l'existance du mod flottes
         if ($OGSpy_Table == "bthof_flottes")
         {
-        // Controle de l'existance du mod flottes et de son activation.
+        // Contrôle de l'existance du mod flottes et de son activation.
             $query = "SELECT active FROM `".TABLE_MOD."` WHERE `title`='flottes'";
             $result    = $db->sql_query($query);
             $modflotte = $db->sql_fetch_row($result);
@@ -162,7 +184,8 @@
                 Update_Flotte();
             }
         }
-        
+        global $pub_GroupBthof;
+        //print_r("group2=$pub_GroupBthof\n");//////////////////////////////////////////////////////////////////TEST
         print("<table align='center'>");
         print("<tr><th width='150px'><font color='#00F0F0'>".$Title."</font></th><th width='50px'><font color='#00F0F0'>Max</font></th><th width='300px'><font color='#00F0F0'>Joueur(s)</font></th>");
         if ($Title != "Flottes" and $Title != "Technologies") {
@@ -174,15 +197,33 @@
         //Pour chaque Batiment/techno/flotte
         for ($NoBld=0 ; $NoBld <= $NbItems ; $NoBld ++)
         {
-          //Requète SQL pour récupérer la valeur Max de chaque type et le nom du joueur associé classé par ordre décroissant			
-            $sql = "SELECT MAX($Table_name[$NoBld]) ,user_name FROM ".$table_prefix.$OGSpy_Table." T JOIN ".TABLE_USER.
-                   " U ON U.user_id = T.user_id WHERE U.user_active='1' GROUP BY user_name ORDER BY 1 DESC";
-            $result = $db->sql_query($sql);
-            
-          //Requète SQL pour récupérer le total par joueur classé par ordre décroissant
-            $sql2 ="SELECT SUM($Table_name[$NoBld]) ,user_name FROM ".$table_prefix.$OGSpy_Table." T JOIN ".TABLE_USER.
-                   " U ON U.user_id = T.user_id WHERE U.user_active='1' GROUP BY user_name ORDER BY 1 DESC";
+            $sqlEnd = "($Table_name[$NoBld]), user_name FROM ".$table_prefix.$OGSpy_Table." T JOIN ";
+            if ($pub_GroupBthof == 0) {
+                $sqlEnd = $sqlEnd.TABLE_USER;
+            } else {
+                $sqlEnd = $sqlEnd."(SELECT u.user_id, user_active, user_name ".
+                         "FROM ".TABLE_USER_GROUP." g JOIN ". TABLE_USER ." u ON u.user_id = g.user_id ".
+                         "WHERE g.group_id = ".$pub_GroupBthof.")";
+            }
+            $sqlEnd = $sqlEnd." a ON a.user_id = T.user_id WHERE a.user_active='1' GROUP BY user_name ORDER BY 1 DESC";
+
+            $sql1 = "SELECT MAX".$sqlEnd;
+            $sql2 = "SELECT SUM".$sqlEnd;
+
+            //print_r("**SQL1=$sql1<br />**SQL2=$sql2<br /><br />\n");//////////////////////////////////////////////////////////////////TEST
+            //Requête SQL pour récupérer la valeur Max de chaque type et le nom du joueur associé classé par ordre décroissant
+            $result = $db->sql_query($sql1);
+            //Requête SQL pour récupérer le total par joueur classé par ordre décroissant
             $result2 = $db->sql_query($sql2);
+
+          // //Requète SQL pour récupérer la valeur Max de chaque type et le nom du joueur associé classé par ordre décroissant			
+            // $sql = "SELECT MAX($Table_name[$NoBld]) ,user_name FROM ".$table_prefix.$OGSpy_Table." T JOIN ".TABLE_USER.
+                   // " U ON U.user_id = T.user_id WHERE U.user_active='1' GROUP BY user_name ORDER BY 1 DESC";
+            // $result = $db->sql_query($sql);
+          // //Requète SQL pour récupérer le total par joueur classé par ordre décroissant
+            // $sql2 ="SELECT SUM($Table_name[$NoBld]) ,user_name FROM ".$table_prefix.$OGSpy_Table." T JOIN ".TABLE_USER.
+                   // " U ON U.user_id = T.user_id WHERE U.user_active='1' GROUP BY user_name ORDER BY 1 DESC";
+            // $result2 = $db->sql_query($sql2);
 
             $val = -1;
             $premiere_fois = 0;
@@ -197,7 +238,7 @@
               // ce controle sert à afficher les ex aequo s'il y en a !!				
                 if($premiere_fois == 1) {
                   //si la valeur est inférieur à la valeur max -> on sort
-                    if ($val_max > $val) {
+                    if ($val_max > $val || $val_max == 0) {
                         break;
                     }
                   //sinon on affiche une virgule et le nom					
@@ -220,14 +261,13 @@
                     echo '<td style=\'color : #FFFFF0; background-color : #273234; text-align: center; \'>' . $row[1];
                 }
             } while (($row = $db->sql_fetch_row($result)));
-            
+
             if ($Title != "Flottes" and $Title != "Technologies") 
             {
                 print("</td>");
                 $val = -1;
                 $flag = 0;
                 $row2 = mysql_fetch_array($result2);
-                //while ($row2 = mysql_fetch_array($result2)) 
                 do {
                     $val = $row2[0];
                     if ($val == 0) {
@@ -236,7 +276,7 @@
                    // ce controle sert à afficher les ex aequo s'il y en a !!
                     if($flag == 1) {
                      //si la valeur est inférieur à la valeur max -> on sort 
-                        if ($val_max > $val) {
+                        if ($val_max > $val || $val_max == 0) {
                             break;
                         }
                      //sinon on affiche une virgule et le nom suivant
@@ -260,7 +300,7 @@
     }
 
     // ================================
-    // = Creation de la chaine BBcode =
+    // = Création de la chaine BBcode =
     // ================================//
     function HOF_bbcode($Table_name, $Table_label, $Title, $OGSpy_Table, $NbItems,
                         $b1, $b2, $b3)
@@ -269,13 +309,32 @@
         if (!isset($db))           { global $db; }
         if (!isset($lien))         { global $lien; }
         if (!isset($bbcode))       { global $bbcode; }
+        global $pub_GroupBthof;
 
         for ($NoBld=0;$NoBld<=$NbItems;$NoBld ++)
         {
-            $sql = "SELECT MAX($Table_name[$NoBld]) ,user_name FROM ".$table_prefix.$OGSpy_Table." T JOIN ".TABLE_USER.
-                   " U ON U.user_id = T.user_id WHERE U.user_active='1' GROUP BY user_name ORDER BY 1 DESC";
-            //echo $NoBld .' : '.$sql.'<br />';
-            $result = $db->sql_query($sql);
+            $sqlEnd = "($Table_name[$NoBld]), user_name FROM ".$table_prefix.$OGSpy_Table." T JOIN ";
+            if ($pub_GroupBthof == 0) {
+                $sqlEnd = $sqlEnd.TABLE_USER;
+            } else {
+                $sqlEnd = $sqlEnd."(SELECT u.user_id, user_active, user_name ".
+                         "FROM ".TABLE_USER_GROUP." g JOIN ". TABLE_USER ." u ON u.user_id = g.user_id ".
+                         "WHERE g.group_id = ".$pub_GroupBthof.")";
+            }
+            $sqlEnd = $sqlEnd." a ON a.user_id = T.user_id WHERE a.user_active='1' GROUP BY user_name ORDER BY 1 DESC";
+
+            $sql1 = "SELECT MAX".$sqlEnd;
+            $sql2 = "SELECT SUM".$sqlEnd;
+
+            //print_r("**SQL1=$sql1<br />**SQL2=$sql2<br /><br />\n");//////////////////////////////////////////////////////////////////TEST
+            //Requête SQL pour récupérer la valeur Max de chaque type et le nom du joueur associé classé par ordre décroissant
+            $result = $db->sql_query($sql1);
+            //Requête SQL pour récupérer le total par joueur classé par ordre décroissant
+            $result2 = $db->sql_query($sql2);
+            
+            // $sql = "SELECT MAX($Table_name[$NoBld]) ,user_name FROM ".$table_prefix.$OGSpy_Table." T JOIN ".TABLE_USER.
+                   // " U ON U.user_id = T.user_id WHERE U.user_active='1' GROUP BY user_name ORDER BY 1 DESC";
+            // //echo $NoBld .' : '.$sql.'<br />';
             $val = -1;
             $premiere_fois = 0;
             $bbcode .= "";
@@ -284,10 +343,13 @@
             while ($row = $db->sql_fetch_row($result))
             {
                 $val = $row[0];
+                if ($val == 0) {
+                    $row[1] = '-';
+                }
                 if($premiere_fois != 0)
                 {
                     $premiere_fois++;
-                    if ($val_max > $val) {
+                    if ($val_max > $val || $val_max == 0) {
                         break;
                     }
                     $bbcode .= ", ".$row[1];
@@ -315,20 +377,20 @@
                 $bbcode .= "[/color]\n";
             }
 			mysql_free_result($result);
+            mysql_free_result($result2);
 		}
-		
 		return "";
 	}
 
     function Mine_HOF_bbcode($prod_metal, $prod_cristal, $prod_deuterium, 
                              $prod_total, $prod_joueur, $b1, $b2, $b3, $b4)
     {
-        if (!isset($bbcode))       { global $bbcode; }
-        
+        if (!isset($bbcode)) { global $bbcode; }
+
         if (!is_array($prod_metal)) {
             return "";
         }
-        
+
         $maxvalue = doublemax($prod_metal);
         if($b1=='') {
             $bbcode .= "- Métal : ";
@@ -381,7 +443,7 @@
         } else {
             $bbcode .= "[color=".$b3."]".$prod_joueur[$maxvalue['i']]."[/color]\n";
         }
-        
+
         arsort($prod_total);
         $bbcode .= "\n\n[b][color=".$b4."]Classement production minière :[/color][/b]\n";
 
@@ -391,7 +453,7 @@
         $bbcode .= '[td][color=#00ffff][b]Cristal[/b][/color][/td]';
         $bbcode .= '[td][color=#00ffff][b]Deutérium[/b][/color][/td]';
         $bbcode .= '[td align="center"][b]Total[/b][/td][/tr]'."\n";
-        
+
         $nb = 1;
         foreach ($prod_total as $key => $val) {
             $bbcode .= '[tr][td][color=white][b]'.$nb.'[/b][/color][/td]';
@@ -400,12 +462,11 @@
             $bbcode .= '[td align="right"][color=lightblue][b]'.number_format($prod_cristal[$key], 0, ',', ' ').'[/b][/color][/td]';
             $bbcode .= '[td align="right"][color=green][b]'.number_format($prod_deuterium[$key], 0, ',', ' ').'[/b][/color][/td]';
             $bbcode .= '[td align="right"][color=grey]'.number_format($prod_total[$key], 0, ',', ' ').'[/color][/td][/tr]'."\n";
-            
             $nb++;
         }
         $bbcode .= "[/table]\n";
-    
     }
+    
     // =================================
     // = Sauvegarde des valeurs BBCode =
     // =================================
@@ -416,7 +477,7 @@
         if (!isset($bbcode_o)) { global $bbcode_o; }
         if (!isset($bbcode_r)) { global $bbcode_r; }
         if (!isset($bbcode_l)) { global $bbcode_l; }
-        
+
         $request = "UPDATE ".TABLE_BTHOF_CONF.
                   " SET bbcode_t='$bbcode_1', bbcode_o='$bbcode_2', bbcode_r='$bbcode_3', bbcode_l='$bbcode_4'";
         $result = $db->sql_query($request);
@@ -428,7 +489,7 @@
     }
 
     // ===================================
-    // = Reccupere les valeurs de bbcode =
+    // = Récupère les valeurs de BBcode =
     // ===================================//
     function Get_BBCode()
     {
@@ -483,14 +544,7 @@
         global $db;
         $sql = 'DELETE FROM ' . TABLE_BTHOF_FLOTTES . '';
         $resultat = mysql_query($sql);
-            
-        // Controle de l'existance du mod flotte et de son activation.
-        /* inutile maintenant puisque appelé seulement par la page flotte quand le mod est installé
-        $query = "SELECT active FROM `".TABLE_MOD."` WHERE `title`='Flottes'";
-        $result = $db->sql_query($query);
-        $modflotte = $db->sql_fetch_row($result);
-        if ($modflotte[0] == "1")
-          {*/
+
           // Je suis quasiment sur qu'on peux faire sans cette table ... à voir !!
         $req = mysql_query("SELECT SUM(PT) as PT, SUM(GT) AS GT, SUM(CLE) AS CLE, SUM(CLO) AS CLO, SUM(CR) AS CR, SUM(VB) AS VB, SUM(VC) AS VC, SUM(REC) AS REC, SUM(SE) AS SE, SUM(BMD) AS BMD, SUM(DST) AS DST, SUM(EDLM) AS EDLM, SUM(TRA) AS TRA, SUM(SAT) AS SAT,user_id FROM ".TABLE_FLOTTES." GROUP BY user_id");
         while($resultat = mysql_fetch_array($req))
@@ -498,21 +552,19 @@
             $resultat = "INSERT INTO ".TABLE_BTHOF_FLOTTES." (user_id, PT, GT, CLE, CLO, CR, VB, VC, REC, SE, BMD, DST, EDLM, TRA, SAT) VALUES ('$resultat[user_id]', '$resultat[PT]', '$resultat[GT]', '$resultat[CLE]', '$resultat[CLO]', '$resultat[CR]', '$resultat[VB]', '$resultat[VC]', '$resultat[REC]', '$resultat[SE]', '$resultat[BMD]', '$resultat[DST]', '$resultat[EDLM]', '$resultat[TRA]', '$resultat[SAT]')";
             $resultat = mysql_query($resultat);
         }
-          //}
     }
-    
+
     function url_exists($url) {
         //url local :
         if (file_exists($url)) {
             return true;
         }
-        
+
         //url distant :
         if(function_exists('curl_init')) {
         // Version php 4.x supported
             $handle   = curl_init($url);
-            if (false == $handle)
-            {
+            if (false == $handle) {
                 return false;
             }
             curl_setopt($handle, CURLOPT_HEADER, false);
@@ -520,7 +572,7 @@
             curl_setopt($handle, CURLOPT_NOBODY, true);
             curl_setopt($handle, CURLOPT_RETURNTRANSFER, false);
             $connectable = curl_exec($handle);
-            curl_close($handle);   
+            curl_close($handle);
             return $connectable;
         } else {
           //version php 5
@@ -533,10 +585,8 @@
         }
     }
 
-    function aff_img($imag, $labelimg)
-    {
+    function aff_img($imag, $labelimg) {
         global $lien;
-        //echo $lien . $imag;
         if(url_exists($lien . $imag)) {
             // elle existe donc on l'affiche
             echo "<img src='" . $lien . $imag . "' alt='".$labelimg."' /><br />";
@@ -545,7 +595,7 @@
             echo "<img src='mod/bthof/pictures/".$imag."'/><br />";
         }
     }
-    
+
     /**
      * Find the number of planet of an user.
      *
@@ -561,7 +611,7 @@
         $request .= " WHERE user_id = " . $user_id;
         $request .= " AND planet_id < 199 ";
         $request .= " ORDER BY planet_id";
-        
+
         $result = $db->sql_query($request); 
       //result is alway an (1,1)array even if user_id doesn't exist
         $tmp = $db->sql_fetch_row();
@@ -586,37 +636,35 @@
         }
         return array("m"=>$maxvalue,"i"=>$maxindex);
     }
-function downloadFile($url, $path) {
 
-  $newfname = $path;
-  $file = fopen ($url, "rb");
-  if ($file) {
-    $newf = fopen ($newfname, "wb");
-    if ($newf) {
-        while(!feof($file)) {
-          fwrite($newf, fread($file, 1024 * 8 ), 1024 * 8 );
+    function downloadFile($url, $path) {
+      $newfname = $path;
+      $file = fopen ($url, "rb");
+      if ($file) {
+        $newf = fopen ($newfname, "wb");
+        if ($newf) {
+            while(!feof($file)) {
+              fwrite($newf, fread($file, 1024 * 8 ), 1024 * 8 );
+            }
+            fclose($newf);
         }
-        fclose($newf);
+        fclose($file);
+      }
     }
-    fclose($file);
-  }
-}
-/**
-* Lit les n premiers octect/caractère d'un fichier.
-* @param string $url L'emplace du fichier ou son adresse URL
-* @param int $lenght La longueur en octet lu. (Attention à un longueur trop grande (>8192 soit 4ko))
-* @return NULL si pas lu, sinon la caractère lu.
-*/
-function read_part_file($url, $lenght) {
-  
-  $file = fopen($url, "rb");
-  if ($file) {
-    $result = fread($file, $lenght);
-    fclose($file);
-    return $result;
-  }
-  return NULL;
-}
 
-
+    /**
+    * Lit les n premiers octet/caractère d'un fichier.
+    * @param string $url L'emplacement du fichier ou son adresse URL
+    * @param int $lenght La longueur en octet lu. (Attention à un longueur trop grande (>8192 soit 4ko))
+    * @return NULL si pas lu, sinon la caractère lu.
+    */
+    function read_part_file($url, $lenght) {
+      $file = fopen($url, "rb");
+      if ($file) {
+        $result = fread($file, $lenght);
+        fclose($file);
+        return $result;
+      }
+      return NULL;
+    }
 ?>
