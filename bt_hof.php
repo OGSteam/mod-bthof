@@ -158,7 +158,7 @@
     <option value="0" <?php if($pub_GroupBthof == "0") echo "SELECTED" ?>>Liste des groupes de HOF (défaut:Tous)</option>
 <?php
     $request = "SELECT group_id, group_name FROM ".TABLE_GROUP.
-               " WHERE group_name NOT IN ('bt_hof', 'Standard')";  
+               " WHERE group_name NOT IN ('bt_hof', 'Standard', 'mod_flottes')";  
     $result = $db->sql_query($request);
    while ($group = $db->sql_fetch_row($result)) {
      list($tmpgroup_id, $tmpgroup_name) = $group;
