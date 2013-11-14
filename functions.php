@@ -329,8 +329,7 @@
             //print_r("**SQL1=$sql1<br />**SQL2=$sql2<br /><br />\n");//////////////////////////////////////////////////////////////////TEST
             //Requête SQL pour récupérer la valeur Max de chaque type et le nom du joueur associé classé par ordre décroissant
             $result = $db->sql_query($sql1);
-            //Requête SQL pour récupérer le total par joueur classé par ordre décroissant
-            $result2 = $db->sql_query($sql2);
+            
             
             // $sql = "SELECT MAX($Table_name[$NoBld]) ,user_name FROM ".$table_prefix.$OGSpy_Table." T JOIN ".TABLE_USER.
                    // " U ON U.user_id = T.user_id WHERE U.user_active='1' GROUP BY user_name ORDER BY 1 DESC";
@@ -376,8 +375,53 @@
             if ($premiere_fois!=0) {
                 $bbcode .= "[/color]\n";
             }
-			mysql_free_result($result);
-            mysql_free_result($result2);
+            if ($Title != "Flottes" and $Title != "Technologies") 
+            {
+                //Requête SQL pour récupérer le total par joueur classé par ordre décroissant
+                $result2 = $db->sql_query($sql2);
+                $val = -1;
+                $premiere_fois = 0;
+                $bbcode .= "";
+                while ($row = $db->sql_fetch_row($result2))
+                {
+                    $val = $row[0];
+                    if ($val == 0) {
+                        $row[1] = '-';
+                    }
+                    if($premiere_fois != 0)
+                    {
+                        $premiere_fois++;
+                        if ($val_max > $val || $val_max == 0) {
+                            break;
+                        }
+                        $bbcode .= ", ".$row[1];
+                    } else {
+                        $premiere_fois++;
+                        $val_max = $row[0];
+                        if($b1=='') {
+                            $bbcode .= " - ".$Table_label[$NoBld];
+                        } else {
+                            $bbcode .= " - [color=".$b1."]".$Table_label[$NoBld]."[/color]";
+                        }
+                        if($b2=='') {
+                            $bbcode .= $row[0];
+                        } else {
+                            $bbcode .= " : [color=".$b2."]".$row[0]."[/color]";
+                        }
+                        if($b3=='') {
+                            $bbcode .= $row[1];
+                        } else {
+                            $bbcode .= " : [color=".$b3."]".$row[1];
+                        }
+                    }
+                }
+                if ($premiere_fois!=0) {
+                    $bbcode .= "[/color]\n";
+                }
+                mysql_free_result($result2);
+                $bbcode .= "\n";
+            }
+			mysql_free_result($result);            
 		}
 		return "";
 	}
