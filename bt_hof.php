@@ -171,7 +171,7 @@
 ?>
 </select>
 <?php
-print_r(" : $pub_GroupBthof\n");//////////////////////////////////////////////////////////////////TEST
+//print_r(" : $pub_GroupBthof\n");//////////////////////////////////////////////////////////////////TEST
 ?>
 </form>
 
@@ -656,6 +656,7 @@ print_r(" : $pub_GroupBthof\n");////////////////////////////////////////////////
                         <i>Mise à jour par Pitch314 (nov 2013)</i>
                         <ul>
                             <li>[Fonctionnalité] HOF pour un groupe d'OGSpy particulier</li>
+                            <li>Ajout sommaire des stats cumulées dans le BBcode</li>
                         </ul>
                     </td>
                 </tr>
