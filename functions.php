@@ -79,6 +79,7 @@
                     // JOIN ". TABLE_USER_TECHNOLOGY ." b ON a.user_id = b.user_id ".
                // "WHERE user_active='1'";
         // }
+        $quet = NULL;
         $result = $db->sql_query($sql);
         $nplayer=0;
         //Début boucle sur joueur
@@ -107,7 +108,6 @@
             $user_building = array_fill(1, $nb_planet, $planet);
 
         // Boucle sur les systèmes d'un joueur
-            // while ($row = mysql_fetch_assoc($quet))
             while ($row = $db->sql_fetch_assoc($quet))
             {
                 $production_CES = ($row['CES_percentage'] / 100) * floor(production("CES", $row['CES'], $off_ingenieur));
@@ -150,10 +150,10 @@
             $nplayer ++;
         } //Fin boucle joueur
         if ($quet != NULL) {
-            mysql_free_result($quet);
+            $quet->free_result();
         }
         if ($result) {
-            mysql_free_result($result);
+            $result->free_result();
         }
         return $nplayer;
     }
@@ -227,9 +227,8 @@
 
             $val = -1;
             $premiere_fois = 0;
-            //while ($row = mysql_fetch_array($result, MYSQL_NUM))
-            //while ($row = $db->sql_fetch_row($result))
             $row = $db->sql_fetch_row($result);
+            if($row == false) {$row[0] = 0;}
             do {
                 $val = $row[0];
                 if ($val == 0) {
@@ -267,7 +266,9 @@
                 print("</td>");
                 $val = -1;
                 $flag = 0;
-                $row2 = mysql_fetch_array($result2);
+                // $row2 = mysql_fetch_array($result2);
+                $row2 = $db->sql_fetch_row($result2);
+                if($row2 == false) {$row2[0] = 0;}
                 do {
                     $val = $row2[0];
                     if ($val == 0) {
@@ -289,11 +290,13 @@
                         echo '<td  width=\'50px\' style=\'color : #FF80F0; background-color : #273234; text-align: center; \'>';
                         printf("%s</td><td width=\"400px\" style=\"color : #FFFFF0; background-color : #273234; text-align: center; \">%s", $row2[0],$row2[1]);
                     }
-                } while ($row2 = mysql_fetch_array($result2)) ;
+                // } while ($row2 = mysql_fetch_array($result2)) ;
+                } while ($row2 = $db->sql_fetch_row($result2)) ;
             }
             echo '</td>' . "\n\t\t\t" . '</tr>';
-            mysql_free_result($result);
-            mysql_free_result($result2);
+            
+            $result->free();
+            $result2->free();
         }
         echo "\n\t\t" . '</table>';
         return 1;
@@ -338,7 +341,6 @@
             $premiere_fois = 0;
             $bbcode .= "";
 
-            //while ($row = mysql_fetch_array($result, MYSQL_NUM))
             while ($row = $db->sql_fetch_row($result))
             {
                 $val = $row[0];
@@ -418,10 +420,10 @@
                 if ($premiere_fois!=0) {
                     $bbcode .= "[/color]\n";
                 }
-                mysql_free_result($result2);
+                $result2->free();
                 $bbcode .= "\n";
             }
-			mysql_free_result($result);            
+			$result->free();
 		}
 		return "";
 	}
@@ -545,7 +547,8 @@
 
         $request = "SELECT bbcode_t,bbcode_o,bbcode_r,bbcode_l FROM ".TABLE_BTHOF_CONF;
         $result  = $db->sql_query($request);
-        $val     = mysql_fetch_array($result);
+        // $val     = mysql_fetch_array($result);
+        $val     = $db->sql_fetch_row($result);
         $bbcode_t = $val[0];
         $bbcode_o = $val[1];
         $bbcode_r = $val[2];
@@ -576,7 +579,8 @@
         $request = "SELECT icon_display_active FROM ".TABLE_BTHOF_CONF;
         $result  = $db->sql_query($request);
 
-        $val = mysql_fetch_array($result);
+        // $val = mysql_fetch_array($result);
+        $val = $db->sql_fetch_row($result);
         $icon_display = $val[0];
     }
 
@@ -587,14 +591,19 @@
     {
         global $db;
         $sql = 'DELETE FROM ' . TABLE_BTHOF_FLOTTES . '';
-        $resultat = mysql_query($sql);
+        $resultat = $db->sql_query($sql);
+        // $resultat = mysql_query($sql);
 
           // Je suis quasiment sur qu'on peux faire sans cette table ... à voir !!
-        $req = mysql_query("SELECT SUM(PT) as PT, SUM(GT) AS GT, SUM(CLE) AS CLE, SUM(CLO) AS CLO, SUM(CR) AS CR, SUM(VB) AS VB, SUM(VC) AS VC, SUM(REC) AS REC, SUM(SE) AS SE, SUM(BMD) AS BMD, SUM(DST) AS DST, SUM(EDLM) AS EDLM, SUM(TRA) AS TRA, SUM(SAT) AS SAT,user_id FROM ".TABLE_FLOTTES." GROUP BY user_id");
-        while($resultat = mysql_fetch_array($req))
+        // $req = mysql_query("SELECT SUM(PT) as PT, SUM(GT) AS GT, SUM(CLE) AS CLE, SUM(CLO) AS CLO, SUM(CR) AS CR, SUM(VB) AS VB, SUM(VC) AS VC, SUM(REC) AS REC, SUM(SE) AS SE, SUM(BMD) AS BMD, SUM(DST) AS DST, SUM(EDLM) AS EDLM, SUM(TRA) AS TRA, SUM(SAT) AS SAT,user_id FROM ".TABLE_FLOTTES." GROUP BY user_id");
+        // while($resultat = mysql_fetch_array($req))
+        $sql = "SELECT SUM(PT) as PT, SUM(GT) AS GT, SUM(CLE) AS CLE, SUM(CLO) AS CLO, SUM(CR) AS CR, SUM(VB) AS VB, SUM(VC) AS VC, SUM(REC) AS REC, SUM(SE) AS SE, SUM(BMD) AS BMD, SUM(DST) AS DST, SUM(EDLM) AS EDLM, SUM(TRA) AS TRA, SUM(SAT) AS SAT,user_id FROM ".TABLE_FLOTTES." GROUP BY user_id";
+        $req = $db->sql_query($sql);
+        while($resultat = $db->sql_fetch_row($req))
         {
-            $resultat = "INSERT INTO ".TABLE_BTHOF_FLOTTES." (user_id, PT, GT, CLE, CLO, CR, VB, VC, REC, SE, BMD, DST, EDLM, TRA, SAT) VALUES ('$resultat[user_id]', '$resultat[PT]', '$resultat[GT]', '$resultat[CLE]', '$resultat[CLO]', '$resultat[CR]', '$resultat[VB]', '$resultat[VC]', '$resultat[REC]', '$resultat[SE]', '$resultat[BMD]', '$resultat[DST]', '$resultat[EDLM]', '$resultat[TRA]', '$resultat[SAT]')";
-            $resultat = mysql_query($resultat);
+            $sql = "INSERT INTO ".TABLE_BTHOF_FLOTTES." (user_id, PT, GT, CLE, CLO, CR, VB, VC, REC, SE, BMD, DST, EDLM, TRA, SAT) VALUES ('$resultat[user_id]', '$resultat[PT]', '$resultat[GT]', '$resultat[CLE]', '$resultat[CLO]', '$resultat[CR]', '$resultat[VB]', '$resultat[VC]', '$resultat[REC]', '$resultat[SE]', '$resultat[BMD]', '$resultat[DST]', '$resultat[EDLM]', '$resultat[TRA]', '$resultat[SAT]')";
+            $resultat = $db->sql_query($sql);
+            // $resultat = mysql_query($resultat);
         }
     }
 
