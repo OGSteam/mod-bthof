@@ -151,10 +151,10 @@
             $nplayer ++;
         } //Fin boucle joueur
         if ($quet != NULL) {
-            $quet->free_result();
+            $db->sql_free_result($quet);
         }
         if ($result) {
-            $result->free_result();
+            $db->sql_free_result($result);
         }
         return $nplayer;
     }
@@ -294,8 +294,8 @@
             }
             echo '</td>' . "\n\t\t\t" . '</tr>';
             
-            $result->free();
-            $result2->free();
+            $db->sql_free_result($result);
+            $db->sql_free_result($result2);
         }
         echo "\n\t\t" . '</table>';
         return 1;
@@ -419,10 +419,10 @@
                 if ($premiere_fois!=0) {
                     $bbcode .= "[/color]\n";
                 }
-                $result2->free();
+                $db->sql_free_result($result2);
                 $bbcode .= "\n";
             }
-			$result->free();
+            $db->sql_free_result($result);
 		}
 		return "";
 	}
