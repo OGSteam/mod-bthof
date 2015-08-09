@@ -7,14 +7,15 @@
  *  Modifications :
  *   - 11/02/2013 par Pitch314 : reformatage et correction erreur HTML.
  *   - 23/02/2013 par Pitch314 : Optimisation HOF production.
- *   - 10/11/2013 par Pitch314 : Ajout de la fonctionnalité de séparation des HOF
+ *   - 10/11/2013 par Pitch314 : Ajout de la fonctionnalitÃ© de sÃ©paration des HOF
  *                      par groupe OGSpy. 
+ *   - 13/06/2015 par Pitch314 : Normalisation utilisation BDD + UTF8
  * **************************************************************************** */
 
 /**
 * @file functions.php
 *
-* functions.php Défini les fonctions du mod
+* functions.php DÃ©fini les fonctions du mod
 *
 * @package [MOD] bt_hof
 * @author  erikosan / Savinien Cyrano (Univers 14)
@@ -22,7 +23,7 @@
 * @version 11-10-2013, v1.1
 * @modified 11/10/2013
 */
-    // On vérifie que le dépôt de ravitaillement soit activé sur l'univers.
+    // On vÃ©rifie que le dÃ©pÃ´t de ravitaillement soit activÃ© sur l'univers.
     $ddr = $server_config['ddr'];
     if ($ddr == 1) {
         $number ="20";
@@ -31,7 +32,7 @@
     }
 
     // ==============================================
-    // = Calcul du classement de production minière =
+    // = Calcul du classement de production miniÃ¨re =
     // ==============================================//
     function Create_Mine_HOF()
     {
@@ -82,7 +83,7 @@
         $quet = NULL;
         $result = $db->sql_query($sql);
         $nplayer=0;
-        //Début boucle sur joueur
+        //DÃ©but boucle sur joueur
         while ($player = $db->sql_fetch_row($result))
         {
             $metal_heure   = 0;
@@ -92,11 +93,11 @@
             list($user_id, $user_name, $off_ingenieur, $off_geologue, $NRJ, $plasma) = $player;
             $nb_planet = find_real_nb_planete_user($user_id);
 // echo $user_name.' ing '.$off_ingenieur.' geo '.$off_geologue.' nrj '.$NRJ.' plasma '.$plasma.'<br />';
-            if ($nb_planet == 0) { //Si le joueur n'a pas de planète encore répertoriée
+            if ($nb_planet == 0) { //Si le joueur n'a pas de planÃ¨te encore rÃ©pertoriÃ©e
                 continue;
             } 
 
-         // Récupération des informations sur les mines du joueur
+         // RÃ©cupÃ©ration des informations sur les mines du joueur
             $sql = 'SELECT DISTINCT planet_id,planet_name,coordinates,`fields`,'.
                         'temperature_min,temperature_max,Sat,M,C,D,CES,CEF,'.
                         'M_percentage, C_percentage, D_percentage, '.
@@ -107,7 +108,7 @@
             $quet = $db->sql_query($sql);
             $user_building = array_fill(1, $nb_planet, $planet);
 
-        // Boucle sur les systèmes d'un joueur
+        // Boucle sur les systÃ¨mes d'un joueur
             while ($row = $db->sql_fetch_assoc($quet))
             {
                 $production_CES = ($row['CES_percentage'] / 100) * floor(production("CES", $row['CES'], $off_ingenieur));
@@ -159,7 +160,7 @@
     }
 
     // ===========================================
-    // = Calcul du classement pour une catégorie =
+    // = Calcul du classement pour une catÃ©gorie =
     // ===========================================//
     function Create_HOF($Table_name, $Table_label, $Table_icon, $Title,
                         $OGSpy_Table, $NbItems, $affich)
@@ -168,19 +169,19 @@
         if (!isset ($db))           { global $db; }
         if (!isset ($lien))         { global $lien; }
 
-        // Contrôle de l'existance du mod flottes
+        // ContrÃ´le de l'existance du mod flottes
         if ($OGSpy_Table == "bthof_flottes")
         {
-        // Contrôle de l'existance du mod flottes et de son activation.
+        // ContrÃ´le de l'existance du mod flottes et de son activation.
             $query = "SELECT active FROM `".TABLE_MOD."` WHERE `title`='flottes'";
             $result    = $db->sql_query($query);
             $modflotte = $db->sql_fetch_row($result);
             if ($modflotte[0] != "1") {
-            // Le mod flotte n'est pas installé ou n'est pas actif 
-                echo "Le mod Flottes doit être installé et actif pour permettre de faire des statistiques sur les flottes";
+            // Le mod flotte n'est pas installÃ© ou n'est pas actif 
+                echo "Le mod Flottes doit Ãªtre installÃ© et actif pour permettre de faire des statistiques sur les flottes";
                 return;
             } else {
-            // Le mod flotte est installé, on met à jour la table TABLE_BTHOF_FLOTTES
+            // Le mod flotte est installÃ©, on met Ã  jour la table TABLE_BTHOF_FLOTTES
                 Update_Flotte();
             }
         }
@@ -211,16 +212,16 @@
             $sql2 = "SELECT SUM".$sqlEnd;
 
             //print_r("**SQL1=$sql1<br />**SQL2=$sql2<br /><br />\n");//////////////////////////////////////////////////////////////////TEST
-            //Requête SQL pour récupérer la valeur Max de chaque type et le nom du joueur associé classé par ordre décroissant
+            //RequÃªte SQL pour rÃ©cupÃ©rer la valeur Max de chaque type et le nom du joueur associÃ© classÃ© par ordre dÃ©croissant
             $result = $db->sql_query($sql1);
-            //Requête SQL pour récupérer le total par joueur classé par ordre décroissant
+            //RequÃªte SQL pour rÃ©cupÃ©rer le total par joueur classÃ© par ordre dÃ©croissant
             $result2 = $db->sql_query($sql2);
 
-          // //Requète SQL pour récupérer la valeur Max de chaque type et le nom du joueur associé classé par ordre décroissant			
+          // //RequÃ¨te SQL pour rÃ©cupÃ©rer la valeur Max de chaque type et le nom du joueur associÃ© classÃ© par ordre dÃ©croissant			
             // $sql = "SELECT MAX($Table_name[$NoBld]) ,user_name FROM ".$table_prefix.$OGSpy_Table." T JOIN ".TABLE_USER.
                    // " U ON U.user_id = T.user_id WHERE U.user_active='1' GROUP BY user_name ORDER BY 1 DESC";
             // $result = $db->sql_query($sql);
-          // //Requète SQL pour récupérer le total par joueur classé par ordre décroissant
+          // //RequÃ¨te SQL pour rÃ©cupÃ©rer le total par joueur classÃ© par ordre dÃ©croissant
             // $sql2 ="SELECT SUM($Table_name[$NoBld]) ,user_name FROM ".$table_prefix.$OGSpy_Table." T JOIN ".TABLE_USER.
                    // " U ON U.user_id = T.user_id WHERE U.user_active='1' GROUP BY user_name ORDER BY 1 DESC";
             // $result2 = $db->sql_query($sql2);
@@ -234,9 +235,9 @@
                 if ($val == 0) {
                     $row[1] = '-';
                 }
-              // ce controle sert à afficher les ex aequo s'il y en a !!				
+              // ce controle sert Ã  afficher les ex aequo s'il y en a !!				
                 if($premiere_fois == 1) {
-                  //si la valeur est inférieur à la valeur max -> on sort
+                  //si la valeur est infÃ©rieur Ã  la valeur max -> on sort
                     if ($val_max > $val || $val_max == 0) {
                         break;
                     }
@@ -245,9 +246,9 @@
                         printf(", %s",$row[1]);
                     }
                 } else {
-                  //on monte le flag comme quoi la boucle à tournée au moins une fois
+                  //on monte le flag comme quoi la boucle Ã  tournÃ©e au moins une fois
                     $premiere_fois = 1;
-                  //on enregistre la valeur max, les résultats étant classé par ordre décroissant, le premier est le plus élevé !!
+                  //on enregistre la valeur max, les rÃ©sultats Ã©tant classÃ© par ordre dÃ©croissant, le premier est le plus Ã©levÃ© !!
                     $val_max = $row[0];
                     echo "\n\t\t\t <tr> \n\t\t\t\t" . "<td style='color : #FF00F0; background-color : #273234; text-align: center;'>";
                     if ($affich) {
@@ -266,7 +267,6 @@
                 print("</td>");
                 $val = -1;
                 $flag = 0;
-                // $row2 = mysql_fetch_array($result2);
                 $row2 = $db->sql_fetch_row($result2);
                 if($row2 == false) {$row2[0] = 0;}
                 do {
@@ -274,23 +274,22 @@
                     if ($val == 0) {
                         $row2[1] = '-';
                     }
-                   // ce controle sert à afficher les ex aequo s'il y en a !!
+                   // ce controle sert Ã  afficher les ex aequo s'il y en a !!
                     if($flag == 1) {
-                     //si la valeur est inférieur à la valeur max -> on sort 
+                     //si la valeur est infÃ©rieur Ã  la valeur max -> on sort 
                         if ($val_max > $val || $val_max == 0) {
                             break;
                         }
                      //sinon on affiche une virgule et le nom suivant
                         printf(", %s",$row2[1]);
                     } else {
-                      //on monte le flag comme quoi la boucle à tournée au moins une fois
+                      //on monte le flag comme quoi la boucle Ã  tournÃ©e au moins une fois
                         $flag = 1;
-                      //on enregistre la valeur max, les résultats étant classé par ordre décroissant, le premier est le plus élevé !!
+                      //on enregistre la valeur max, les rÃ©sultats Ã©tant classÃ© par ordre dÃ©croissant, le premier est le plus Ã©levÃ© !!
                         $val_max = $row2[0];
                         echo '<td  width=\'50px\' style=\'color : #FF80F0; background-color : #273234; text-align: center; \'>';
                         printf("%s</td><td width=\"400px\" style=\"color : #FFFFF0; background-color : #273234; text-align: center; \">%s", $row2[0],$row2[1]);
                     }
-                // } while ($row2 = mysql_fetch_array($result2)) ;
                 } while ($row2 = $db->sql_fetch_row($result2)) ;
             }
             echo '</td>' . "\n\t\t\t" . '</tr>';
@@ -303,7 +302,7 @@
     }
 
     // ================================
-    // = Création de la chaine BBcode =
+    // = CrÃ©ation de la chaine BBcode =
     // ================================//
     function HOF_bbcode($Table_name, $Table_label, $Title, $OGSpy_Table, $NbItems,
                         $b1, $b2, $b3)
@@ -330,7 +329,7 @@
             $sql2 = "SELECT SUM".$sqlEnd;
 
             //print_r("**SQL1=$sql1<br />**SQL2=$sql2<br /><br />\n");//////////////////////////////////////////////////////////////////TEST
-            //Requête SQL pour récupérer la valeur Max de chaque type et le nom du joueur associé classé par ordre décroissant
+            //RequÃªte SQL pour rÃ©cupÃ©rer la valeur Max de chaque type et le nom du joueur associÃ© classÃ© par ordre dÃ©croissant
             $result = $db->sql_query($sql1);
             
             
@@ -379,7 +378,7 @@
             }
             if ($Title != "Flottes" and $Title != "Technologies") 
             {
-                //Requête SQL pour récupérer le total par joueur classé par ordre décroissant
+                //RequÃªte SQL pour rÃ©cupÃ©rer le total par joueur classÃ© par ordre dÃ©croissant
                 $result2 = $db->sql_query($sql2);
                 $val = -1;
                 $premiere_fois = 0;
@@ -439,9 +438,9 @@
 
         $maxvalue = doublemax($prod_metal);
         if($b1=='') {
-            $bbcode .= "- Métal : ";
+            $bbcode .= "- MÃ©tal : ";
         } else {
-            $bbcode .= "- [color=".$b1."]Métal : [/color]";
+            $bbcode .= "- [color=".$b1."]MÃ©tal : [/color]";
         }
         if($b2=='') {
             $bbcode .= number_format($maxvalue['m'], 0, ',', ' ')." : ";
@@ -475,9 +474,9 @@
         // arsort($prod_deuterium);
         // list($key,$val) = each($prod_deuterium);
         if($b1=='') {
-            $bbcode .= "- Deutérium : ";
+            $bbcode .= "- DeutÃ©rium : ";
         } else {
-            $bbcode .= "- [color=".$b1."]Deutérium : [/color]";
+            $bbcode .= "- [color=".$b1."]DeutÃ©rium : [/color]";
         }
         if($b2=='') {
             $bbcode .= number_format($maxvalue['m'], 0, ',', ' ')." : ";
@@ -491,13 +490,13 @@
         }
 
         arsort($prod_total);
-        $bbcode .= "\n\n[b][color=".$b4."]Classement production minière :[/color][/b]\n";
+        $bbcode .= "\n\n[b][color=".$b4."]Classement production miniÃ¨re :[/color][/b]\n";
 
         $bbcode .= '[table cellspacing="2"]'."\n";
         $bbcode .= '[tr][td colspan="2"][color=#ff00ff][b]Production par jour[/b][/color][/td]';
-        $bbcode .= '[td][color=#00ffff][b]Métal[/b][/color][/td]';
+        $bbcode .= '[td][color=#00ffff][b]MÃ©tal[/b][/color][/td]';
         $bbcode .= '[td][color=#00ffff][b]Cristal[/b][/color][/td]';
-        $bbcode .= '[td][color=#00ffff][b]Deutérium[/b][/color][/td]';
+        $bbcode .= '[td][color=#00ffff][b]DeutÃ©rium[/b][/color][/td]';
         $bbcode .= '[td align="center"][b]Total[/b][/td][/tr]'."\n";
 
         $nb = 1;
@@ -535,7 +534,7 @@
     }
 
     // ===================================
-    // = Récupère les valeurs de BBcode =
+    // = RÃ©cupÃ¨re les valeurs de BBcode =
     // ===================================//
     function Get_BBCode()
     {
@@ -547,7 +546,6 @@
 
         $request = "SELECT bbcode_t,bbcode_o,bbcode_r,bbcode_l FROM ".TABLE_BTHOF_CONF;
         $result  = $db->sql_query($request);
-        // $val     = mysql_fetch_array($result);
         $val     = $db->sql_fetch_row($result);
         $bbcode_t = $val[0];
         $bbcode_o = $val[1];
@@ -579,7 +577,6 @@
         $request = "SELECT icon_display_active FROM ".TABLE_BTHOF_CONF;
         $result  = $db->sql_query($request);
 
-        // $val = mysql_fetch_array($result);
         $val = $db->sql_fetch_row($result);
         $icon_display = $val[0];
     }
@@ -592,9 +589,8 @@
         global $db;
         $sql = 'DELETE FROM ' . TABLE_BTHOF_FLOTTES . '';
         $resultat = $db->sql_query($sql);
-        // $resultat = mysql_query($sql);
 
-          // Je suis quasiment sur qu'on peux faire sans cette table ... à voir !!
+          // Je suis quasiment sur qu'on peux faire sans cette table ... Ã  voir !!
         // $req = mysql_query("SELECT SUM(PT) as PT, SUM(GT) AS GT, SUM(CLE) AS CLE, SUM(CLO) AS CLO, SUM(CR) AS CR, SUM(VB) AS VB, SUM(VC) AS VC, SUM(REC) AS REC, SUM(SE) AS SE, SUM(BMD) AS BMD, SUM(DST) AS DST, SUM(EDLM) AS EDLM, SUM(TRA) AS TRA, SUM(SAT) AS SAT,user_id FROM ".TABLE_FLOTTES." GROUP BY user_id");
         // while($resultat = mysql_fetch_array($req))
         $sql = "SELECT SUM(PT) as PT, SUM(GT) AS GT, SUM(CLE) AS CLE, SUM(CLO) AS CLO, SUM(CR) AS CR, SUM(VB) AS VB, SUM(VC) AS VC, SUM(REC) AS REC, SUM(SE) AS SE, SUM(BMD) AS BMD, SUM(DST) AS DST, SUM(EDLM) AS EDLM, SUM(TRA) AS TRA, SUM(SAT) AS SAT,user_id FROM ".TABLE_FLOTTES." GROUP BY user_id";
@@ -603,7 +599,6 @@
         {
             $sql = "INSERT INTO ".TABLE_BTHOF_FLOTTES." (user_id, PT, GT, CLE, CLO, CR, VB, VC, REC, SE, BMD, DST, EDLM, TRA, SAT) VALUES ('$resultat[user_id]', '$resultat[PT]', '$resultat[GT]', '$resultat[CLE]', '$resultat[CLO]', '$resultat[CR]', '$resultat[VB]', '$resultat[VC]', '$resultat[REC]', '$resultat[SE]', '$resultat[BMD]', '$resultat[DST]', '$resultat[EDLM]', '$resultat[TRA]', '$resultat[SAT]')";
             $resultat = $db->sql_query($sql);
-            // $resultat = mysql_query($resultat);
         }
     }
 
@@ -644,7 +639,7 @@
             // elle existe donc on l'affiche
             echo "<img src='" . $lien . $imag . "' alt='".$labelimg."' /><br />";
         } else {
-            //affichage des images du mod par défaut
+            //affichage des images du mod par dÃ©faut
             echo "<img src='mod/bthof/pictures/".$imag."'/><br />";
         }
     }
@@ -706,10 +701,10 @@
     }
 
     /**
-    * Lit les n premiers octet/caractère d'un fichier.
+    * Lit les n premiers octet/caractÃ¨re d'un fichier.
     * @param string $url L'emplacement du fichier ou son adresse URL
-    * @param int $lenght La longueur en octet lu. (Attention à un longueur trop grande (>8192 soit 4ko))
-    * @return NULL si pas lu, sinon la caractère lu.
+    * @param int $lenght La longueur en octet lu. (Attention Ã  un longueur trop grande (>8192 soit 4ko))
+    * @return NULL si pas lu, sinon la caractÃ¨re lu.
     */
     function read_part_file($url, $lenght) {
       $file = fopen($url, "rb");

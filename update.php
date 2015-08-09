@@ -9,7 +9,7 @@ if (!isset($table_prefix)) global $table_prefix;
 define('TABLE_BTHOF_CONF',$table_prefix.'bthof_conf');
 define('TABLE_BTHOF_FLOTTES',$table_prefix.'bthof_flottes');
 
-// Test de présence de la table de configuration
+// Test de prÃ©sence de la table de configuration
 $query = "SELECT * FROM ".TABLE_BTHOF_CONF." WHERE 1";
 $result = $db->sql_query($query);
 $conf_existe = $db->sql_numrows($result);
@@ -20,19 +20,19 @@ echo $conf_existe."\n";
 if(!$result) 
 {
 	echo "nul\n";
-	// création de la table d'enregistrement des préférences (pour les joueurs)
+	// crÃ©ation de la table d'enregistrement des prÃ©fÃ©rences (pour les joueurs)
 	$query = "CREATE TABLE `".$table_prefix.'bthof_conf'."` ("
 		."  `user_id` int(11) NOT NULL COMMENT 'ID du compte OGSpy',"
-		."  `icon_display_active` tinyint(1) NOT NULL default '1' COMMENT 'active ou non les icônes graphiques',"
-		."  `bbcode_t` varchar(8) NOT NULL default '' COMMENT 'couleur bbcode pour les titres (ex : Bâtiments)',"
-		."  `bbcode_o` varchar(8) NOT NULL default '' COMMENT 'couleur bbcode pour les objets (ex : Mine de Métal)',"
+		."  `icon_display_active` tinyint(1) NOT NULL default '1' COMMENT 'active ou non les icÃ´nes graphiques',"
+		."  `bbcode_t` varchar(8) NOT NULL default '' COMMENT 'couleur bbcode pour les titres (ex : BÃ¢timents)',"
+		."  `bbcode_o` varchar(8) NOT NULL default '' COMMENT 'couleur bbcode pour les objets (ex : Mine de MÃ©tal)',"
 		."  `bbcode_r` varchar(8) NOT NULL default '' COMMENT 'couleur bbcode pour les valeurs de records (ex : 28)',"
 		."  `bbcode_l` varchar(8) NOT NULL default '' COMMENT 'couleur bbcode pour les recordmens (ex : toto, titi)',"
 		."  PRIMARY KEY  (`user_id`)"
-		."  ) COMMENT='sauvegarde des paramètres bt_hof'";
+		."  ) COMMENT='sauvegarde des paramÃ¨tres bt_hof'";
 	$db->sql_query($query);
 
-	//Insertion des valeurs par défaut
+	//Insertion des valeurs par dÃ©faut
 	$query = "INSERT INTO ".TABLE_BTHOF_CONF." (user_id, icon_display_active, bbcode_t, bbcode_o, bbcode_r, bbcode_l) VALUES ('','1','orange','','red','yellow')";
 	$db->sql_query($query);
 }
@@ -46,7 +46,7 @@ elseif($conf_existe == 0)
 		$query = "ALTER TABLE `".$table_prefix.'bthof_conf'."` ADD `bbcode_t` varchar(8) NOT NULL, ADD `bbcode_o` varchar(8) NOT NULL, ADD `bbcode_r` varchar(8) NOT NULL, ADD `bbcode_l` varchar(8) NOT NULL";
 		$db->sql_query($query);
 	}
-	//Insertion des valeurs par défaut
+	//Insertion des valeurs par dÃ©faut
 	$query = "INSERT INTO ".TABLE_BTHOF_CONF." (user_id, icon_display_active, bbcode_t, bbcode_o, bbcode_r, bbcode_l) VALUES ('','1','orange','','red','yellow')";
 	$db->sql_query($query);
 }
@@ -55,7 +55,7 @@ $query  = $db->sql_query("SELECT `version` FROM `".TABLE_MOD."` WHERE action='bt
 $result = $db->sql_fetch_assoc($query);
 $version = $result['version'];
 
-// création de la table d'enregistrment des flottes
+// crÃ©ation de la table d'enregistrment des flottes
 if ($version == "0.4") {
 	$query2 = "CREATE TABLE `".TABLE_BTHOF_FLOTTES."` ("
 	."	user_id int(11) NOT NULL default '0',"

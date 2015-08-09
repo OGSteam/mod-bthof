@@ -21,16 +21,16 @@ if ($is_ok == true)	{
 		$query = "DROP TABLE IF EXISTS `".$table_prefix.'bthof_flotte'."`";
 		$db->sql_query($query);
 
-// création de la table d'enregistrement des préférences (pour les joueurs)
+// crÃ©ation de la table d'enregistrement des prÃ©fÃ©rences (pour les joueurs)
     $query = "CREATE TABLE `".$table_prefix.'bthof_conf'."` ("
         ."  `user_id` int(11) NOT NULL COMMENT 'ID du compte OGSpy',"
-        ."  `icon_display_active` tinyint(1) NOT NULL default '1' COMMENT 'active ou non les icônes graphiques',"
-        ."  `bbcode_t` varchar(8) NOT NULL default '' COMMENT 'couleur bbcode pour les titres (ex : Bâtiments)',"
-        ."  `bbcode_o` varchar(8) NOT NULL default '' COMMENT 'couleur bbcode pour les objets (ex : Mine de Métal)',"
+        ."  `icon_display_active` tinyint(1) NOT NULL default '1' COMMENT 'active ou non les icÃ´nes graphiques',"
+        ."  `bbcode_t` varchar(8) NOT NULL default '' COMMENT 'couleur bbcode pour les titres (ex : BÃ¢timents)',"
+        ."  `bbcode_o` varchar(8) NOT NULL default '' COMMENT 'couleur bbcode pour les objets (ex : Mine de MÃ©tal)',"
         ."  `bbcode_r` varchar(8) NOT NULL default '' COMMENT 'couleur bbcode pour les valeurs de records (ex : 28)',"
         ."  `bbcode_l` varchar(8) NOT NULL default '' COMMENT 'couleur bbcode pour les recordmens (ex : toto, titi)',"
         ."  PRIMARY KEY  (`user_id`)"
-        ."  ) COMMENT='sauvegarde des paramètres bt_hof'";
+        ."  ) COMMENT='sauvegarde des paramÃ¨tres bt_hof'";
         $db->sql_query($query);
 
     $query = "INSERT INTO ".TABLE_BTHOF_CONF.
@@ -58,6 +58,6 @@ if ($is_ok == true)	{
         ."	) COMMENT='flotte de la partie bt_hof'";
         $db->sql_query($query);
 } else {
-    echo  "<script>alert('Désolé, un problème a eu lieu pendant l'installation, corrigez les problèmes survenue et réessayez.');</script>";
+    echo  "<script>alert('DÃ©solÃ©, un problÃ¨me a eu lieu pendant l'installation, corrigez les problÃ¨mes survenue et rÃ©essayez.');</script>";
 }
 ?>

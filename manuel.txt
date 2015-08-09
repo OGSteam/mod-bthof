@@ -8,31 +8,31 @@
 ==== 1) Introduction ====
 \\
 ==== 2) Administration ====
-=== a) Droits d'accès ===
-Ce mod gère les permissions d'accès grâce aux groupes d'OGSpy. Cela veut dire qu'il est possible de restreindre l'accès à ce mod pour certain utilisateur.
+=== a) Droits d'accÃ¨s ===
+Ce mod gÃ¨re les permissions d'accÃ¨s grÃ¢ce aux groupes d'OGSpy. Cela veut dire qu'il est possible de restreindre l'accÃ¨s Ã  ce mod pour certain utilisateur.
 
-Il suffit pour cela de créer un groupe "bt_hof" et d'y ajouter les utilisateurs autorisés pour l'utilisation de ce mod. Par défaut, toute personne est autorisée à aller sur ce mod et donc à voir les différents classements.\\
-__ Méthode : __
-  * Création d'un groupe OGSpy nommé "bt_hof" dans le menu "Administration" d'OGSpy.
-  * Ajouter les utilisateurs étant autorisé à utiliser le mod ** bthof **
+Il suffit pour cela de crÃ©er un groupe "bt_hof" et d'y ajouter les utilisateurs autorisÃ©s pour l'utilisation de ce mod. Par dÃ©faut, toute personne est autorisÃ©e Ã  aller sur ce mod et donc Ã  voir les diffÃ©rents classements.\\
+__ MÃ©thode : __
+  * CrÃ©ation d'un groupe OGSpy nommÃ© "bt_hof" dans le menu "Administration" d'OGSpy.
+  * Ajouter les utilisateurs Ã©tant autorisÃ© Ã  utiliser le mod ** bthof **
  
  
 === b) Gestion de groupes ===
-Ce mod gère la différenciation de classement pour un ensemble d'utilisateur donné, grâce aux groupes d'OGSpy.
+Ce mod gÃ¨re la diffÃ©renciation de classement pour un ensemble d'utilisateur donnÃ©, grÃ¢ce aux groupes d'OGSpy.
 
-Par exemple, si votre OGSpy héberge deux ou plusieurs alliances (souvent des Wings), il est utile d'avoir un HOF pour chaque des alliances. Certes, le HOF sera toujours présent, mais chaque alliance pourra avoir son propre HOF.
+Par exemple, si votre OGSpy hÃ©berge deux ou plusieurs alliances (souvent des Wings), il est utile d'avoir un HOF pour chaque des alliances. Certes, le HOF sera toujours prÃ©sent, mais chaque alliance pourra avoir son propre HOF.
 
-Il suffit pour cela de créer un groupe pour chaque ensemble d'utilisateur (ou alliance) et d'y mettre les utilisateurs correspondant.\\
-__ Méthode : __
-  * (1) Création d'un groupe OGSpy dans le menu "Administration" d'OGSpy.
-  * (2) Ajouter les utilisateurs correspondant au groupe créé.
+Il suffit pour cela de crÃ©er un groupe pour chaque ensemble d'utilisateur (ou alliance) et d'y mettre les utilisateurs correspondant.\\
+__ MÃ©thode : __
+  * (1) CrÃ©ation d'un groupe OGSpy dans le menu "Administration" d'OGSpy.
+  * (2) Ajouter les utilisateurs correspondant au groupe crÃ©Ã©.
 \\
 ==== 3) Utilisation ====
-Ce mod donne les classements maxima dans le domaine des bâtiments, technologie, défense, flottes et production minière.\\
-** HOF bâtiment : ** Le plus haut niveau d'un bâtiment ET la somme la plus importante des niveaux cumulés pour un bâtiment d'un empire.\\
+Ce mod donne les classements maxima dans le domaine des bÃ¢timents, technologie, dÃ©fense, flottes et production miniÃ¨re.\\
+** HOF bÃ¢timent : ** Le plus haut niveau d'un bÃ¢timent ET la somme la plus importante des niveaux cumulÃ©s pour un bÃ¢timent d'un empire.\\
 ** HOF technologie : ** Le plus haut niveau de technologie atteint.\\
-** HOF défense : ** Le plus grand nombre d'unité d'une défense sur une planète ET la somme cumulée d'une défense sur un empire.\\
+** HOF dÃ©fense : ** Le plus grand nombre d'unitÃ© d'une dÃ©fense sur une planÃ¨te ET la somme cumulÃ©e d'une dÃ©fense sur un empire.\\
 ** HOF flottes : ** Le plus grand nombre d'un vaisseau sur un empire.\\
-** HOF production minière : ** Classement des joueurs par rapport à leur production minière.
+** HOF production miniÃ¨re : ** Classement des joueurs par rapport Ã  leur production miniÃ¨re.
 
-La liste déroulante permet de restreindre le HOF à une catégorie de joueur particulier (membre d'une alliance par ex.).
+La liste dÃ©roulante permet de restreindre le HOF Ã  une catÃ©gorie de joueur particulier (membre d'une alliance par ex.).
