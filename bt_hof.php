@@ -124,14 +124,16 @@
 
     $nplayer=0;
 
+    /*Gestion du skin :*/
+    $lien = "mod/bthof/picture/";
     // Prendre le skin serveur par défaut s'il n'y en a pas dans le profil utilisateur
-    if ($user_data["user_skin"]."a" == "a") {
-        //$lien = $server_config["default_skin"]."gebaeude/";
-        $lien = "mod/bthof/picture/";
-        //$lien = 'http://127.0.0.1/ogspy-3.1.0/' . $lien;
-    } else {
-        $lien = $user_data["user_skin"]."gebaeude/";
-    }
+    // if ($user_data["user_skin"]."a" == "a") {
+        // //$lien = $server_config["default_skin"]."gebaeude/";
+        // $lien = "mod/bthof/picture/";
+        // //$lien = 'http://127.0.0.1/ogspy-3.1.0/' . $lien;
+    // } else {
+        // $lien = $user_data["user_skin"]."gebaeude/";
+    // }
 
     /****************************************************************************/
     /* ** Menu Principal ** */
@@ -287,9 +289,9 @@
                 <table style='width : 60%; text-align : center; margin-bottom : 20px;'>
                 <tr>
                     <td class='c' style='color : #FF00FF; width : 28%;' colspan='2'>Production par <?php echo $tbl['titre']; ?></td>
-                    <td class='c' style='width : 18%;'><a href='index.php?action=bt_hof&amp;subaction=Production&amp;mine=metal'>Métal</a></td>
+                    <td class='c' style='width : 18%;'><a href='index.php?action=bt_hof&amp;subaction=Production&amp;mine=metal'>M&eacute;tal</a></td>
                     <td class='c' style='width : 18%;'><a href='index.php?action=bt_hof&amp;subaction=Production&amp;mine=cristal'>Cristal</a></td>
-                    <td class='c' style='width : 18%;'><a href='index.php?action=bt_hof&amp;subaction=Production&amp;mine=deuterium'>Deutérium</a></td>
+                    <td class='c' style='width : 18%;'><a href='index.php?action=bt_hof&amp;subaction=Production&amp;mine=deuterium'>Deut&eacute;rium</a></td>
                     <td class='c' style='width : 18%;'><a href='index.php?action=bt_hof&amp;subaction=Production&amp;mine=total'>Total</a></td>
                 </tr>
 <?php
