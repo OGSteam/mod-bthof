@@ -8,22 +8,23 @@
  *   - 11/02/2013 par Pitch314 : reformatage et correction erreur HTML.
  *   - 23/02/2013 par Pitch314 : Optimisation pour trouver un max et ajout du tableau
  *                      de production dans le BBcode.
- *   - 10/11/2013 par Pitch314 : Ajout de la fonctionnalité de séparation des HOF
+ *   - 10/11/2013 par Pitch314 : Ajout de la fonctionnalitÃ© de sÃ©paration des HOF
  *                      par groupe OGSpy.
+ *   - 15/08/2015 par Pitch314 : Normalisation utilisation BDD + UTF8
  * **************************************************************************** */
 
 /* ************************************************************************* *
  *	Le Classement fourni par ce mod concerne tous les membres actifs du serveur OGSpy.
- *	Il se base sur les données fournies dans l'onglet Empire de OGspy et fournit les HOF Bâtiments/Recherche/Défense
- *	Ce mod gère les permissions d'accès grâce aux groupes d'OGSpy.
- *	Il suffit pour cela de créer un groupe "bt_hof" et d'y ajouter les utilisateurs autorisés pour l'utilisation de ce mod
+ *	Il se base sur les donnÃ©es fournies dans l'onglet Empire de OGspy et fournit les HOF BÃ¢timents/Recherche/DÃ©fense
+ *	Ce mod gÃ¨re les permissions d'accÃ¨s grÃ¢ce aux groupes d'OGSpy.
+ *	Il suffit pour cela de crÃ©er un groupe "bt_hof" et d'y ajouter les utilisateurs autorisÃ©s pour l'utilisation de ce mod
  *	Si AUCUN GROUPE N'EST CREE, TOUS LES MEMBRES ONT ACCES
  * ************************************************************************* */
 /**
  * @file    bt_hof.php
  *
- * Gère le fonctionnement du mod "Building & Techno HOF" qui permet de faire des
- * HOF Bâtiments/Recherche/Défense et un classement de la production minière.
+ * GÃ¨re le fonctionnement du mod "Building & Techno HOF" qui permet de faire des
+ * HOF BÃ¢timents/Recherche/DÃ©fense et un classement de la production miniÃ¨re.
  *
  * @version 11-10-2013, v1.1
  * @package [MOD] bt_hof
@@ -73,7 +74,7 @@
         }
     }
 
-	// Récupération du choix d'affichage
+	// RÃ©cupÃ©ration du choix d'affichage
 
     if (!isset($affichage)) {
         global $affichage;
@@ -96,22 +97,22 @@
     global $bbcode;
     global $bbbat;
 
-    $bbcode = "[color=orange][b][u]HoF Bâtiments - Flottes - Technologies - Défense - Production Miniere[/u][/b][/color]\n\n";
+    $bbcode = "[color=orange][b][u]HoF B&acirc;timents - Flottes - Technologies - D&eacute;fense - Production Miniere[/u][/b][/color]\n\n";
 
     $Building_Name  = array("M"            ,"C"              ,"D"                        ,"CES"                        ,"CEF"                          ,"UdR"            ,"UdN"              ,"CSp"             ,"HM"             ,"HC"               ,"HD"                    ,"CM"               ,"CC"                 ,"CD"                   ,"Lab"                     ,"Ter"         ,"Silo"             ,"BaLu"        ,"Pha"                ,"PoSa"                 ,"DdR");
-    $Building_Label = array("Mine de métal","Mine de Cristal","Synthétiseur de deutérium","Centrale électrique solaire","Centrale électrique de fusion","Usine de robots","Usine de nanites ","Chantier spatial","Hangar de métal","Hangar de cristal","Réservoir de deutérium","Cachette de métal","Cachette de cristal","Cachette de deutérium","Laboratoire de recherche","Terraformeur","Silo de missiles ","Base Lunaire","Phalange de capteur","Porte de saut spatial","Dépôt de Ravitaillement");
+    $Building_Label = array("Mine de m&eacute;tal","Mine de cristal","Synth&eacute;tiseur de deut&eacute;rium","Centrale &eacute;lectrique solaire","Centrale &eacute;lectrique de fusion","Usine de robots","Usine de nanites ","Chantier spatial","Hangar de m&eacute;tal","Hangar de cristal","R&eacute;servoir de deut&eacute;rium","Cachette de m&eacute;tal","Cachette de cristal","Cachette de deut&eacute;rium","Laboratoire de recherche","Terraformeur","Silo de missiles ","Base lunaire","Phalange de capteur","Porte de saut spatial","D&eacute;p&ocirc;t de ravitaillement");
     $Building_icon  = array("1.gif"        ,"2.gif"          ,"3.gif"                    ,"4.gif"                      ,"12.gif"                       ,"14.gif"         ,"15.gif"           ,"21.gif"          ,"22.gif"         ,"23.gif"           ,"24.gif"                ,"25.gif"           ,"26.gif"             ,"27.gif"               ,"31.gif"                  ,"33.gif"      ,"44.gif"           ,"41.gif"      ,"42.gif"             ,"43.gif"               ,"34.gif");
 
     $Flottes_Name  = array("PT"                ,"GT"                ,"CLE"           ,"CLO"           ,"CR"      ,"VB"                  ,"VC"                      ,"REC"      ,"SE"                ,"BMD"       ,"DST"        ,"EDLM"             ,"TRA"     ,"SAT");
-    $Flottes_Label = array("Petit Transporteur","Grand Transporteur","Chasseur Léger","Chasseur Lourd","Croiseur","Vaisseau de Bataille","Vaisseau de Colonisation","Recycleur","Sonde d'Espionnage","Bombardier","Destructeur","Etoile de la Mort","Traqueur","Satellite Solaire");
+    $Flottes_Label = array("Petit Transporteur","Grand Transporteur","Chasseur L&eacute;ger","Chasseur Lourd","Croiseur","Vaisseau de Bataille","Vaisseau de Colonisation","Recycleur","Sonde d'Espionnage","Bombardier","Destructeur","&Eacute;toile de la Mort","Traqueur","Satellite Solaire");
     $Flottes_icon  = array("202.gif"           ,"203.gif"           ,"204.gif"       ,"205.gif"       ,"206.gif" ,"207.gif"             ,"208.gif"                 ,"209.gif"  ,"210.gif"           ,"211.gif"   ,"213.gif"    ,"214.gif"          ,"215.gif" ,"212.gif");
 
     $Tech_name     = array("Esp"                   ,"Ordi"                  ,"Armes"            ,"Bouclier"            ,"Protection"        ,"NRJ"                ,"Hyp"                    ,"RC"                   ,"RI"                  ,"PH"                    ,"Laser"            ,"Ions"            ,"Plasma"            ,"RRI"                ,"Astrophysique"            ,"Graviton");
-    $Tech_label    = array("Technologie Espionnage","Technologie Ordinateur","Technologie Armes","Technologie Bouclier","Protect. Vaisseaux","Technologie Energie","Technologie Hyperespace","Réacteur à Combustion","Réacteur à Impulsion","Propulsion Hyperespace","Technologie Laser","Technologie Ions","Technologie Plasma","Réseau de Recherche","Technologie Astrophysique","Technologie Graviton");
+    $Tech_label    = array("Technologie Espionnage","Technologie Ordinateur","Technologie Armes","Technologie Bouclier","Protect. Vaisseaux","Technologie &Eacute;nergie","Technologie Hyperespace","R&eacute;acteur &agrave; Combustion","R&eacute;acteur &agrave; Impulsion","Propulsion Hyperespace","Technologie Laser","Technologie Ions","Technologie Plasma","R&eacute;seau de Recherche","Technologie Astrophysique","Technologie Graviton");
     $Tech_icon     = array("106.gif"               ,"108.gif"               ,"109.gif"          ,"110.gif"             ,"111.gif"           ,"113.gif"            ,"114.gif"                ,"115.gif"              ,"117.gif"             ,"118.gif"               ,"120.gif"          ,"121.gif"         ,"122.gif"           ,"123.gif"            ,"124.gif"                  ,"199.gif");
 
     $Def_name      = array("LM"           ,"LLE"        ,"LLO"        ,"CG"         ,"AI"            ,"LP"          ,"MIC"                 ,"MIP");
-    $Def_label     = array("Lance Missile","Laser Léger","Laser Lourd","Canon Gauss","Artillerie Ion","Lance Plasma","Missile Interception","Missile InterPlanétaire");
+    $Def_label     = array("Lance Missile","Laser L&eacute;ger","Laser Lourd","Canon Gauss","Artillerie Ion","Lance Plasma","Missile Interception","Missile InterPlan&eacute;taire");
     $Def_icon      = array("401.gif"      ,"402.gif"    ,"403.gif"    ,"404.gif"    ,"405.gif"       ,"406.gif"     ,"502.gif"             ,"503.gif");
 
     if (!isset($nplayer))              { global $nplayer; }
@@ -126,7 +127,7 @@
 
     /*Gestion du skin :*/
     $lien = "mod/bthof/picture/";
-    // Prendre le skin serveur par défaut s'il n'y en a pas dans le profil utilisateur
+    // Prendre le skin serveur par dÃ©faut s'il n'y en a pas dans le profil utilisateur
     // if ($user_data["user_skin"]."a" == "a") {
         // //$lien = $server_config["default_skin"]."gebaeude/";
         // $lien = "mod/bthof/picture/";
@@ -157,7 +158,7 @@
 
 <form style='margin:0px;padding:0px;' action="" method="POST">
 <select name="GroupBthof" onchange="this.form.submit();">
-    <option value="0" <?php if($pub_GroupBthof == "0") echo "SELECTED" ?>>Liste des groupes de HOF (défaut:Tous)</option>
+    <option value="0" <?php if($pub_GroupBthof == "0") echo "SELECTED" ?>>Liste des groupes de HOF (d&eacute;faut:Tous)</option>
 <?php
     $request = "SELECT group_id, group_name FROM ".TABLE_GROUP.
                " WHERE group_name NOT IN ('bt_hof', 'Standard', 'mod_flottes')";  
@@ -180,7 +181,7 @@
 <table style='width : 100%; text-align : center; margin-bottom : 20px;'>
     <tr>
     <?php
-//menu Bâtiments
+//menu BÃ¢timents
     if ($pub_subaction != 'Batiments'){
         echo '<td class="c" width="'.$rowWidth.'%"><a href="index.php?action=bt_hof&amp;subaction=Batiments&amp;GroupBthof='.$pub_GroupBthof.'" style="color: lime;"';
         echo '>B&acirc;timents</a></td>',"\n";
@@ -212,7 +213,7 @@
         echo '<th width="'.$rowWidth.'%"><a';
         echo '>D&eacute;fense</a></th>',"\n";
     }
-//menu prod minière
+//menu prod miniÃ¨re
     if ($pub_subaction != 'Production') {
         echo '<td class="c" width="'.$rowWidth.'%"><a href="index.php?action=bt_hof&amp;subaction=Production&amp;GroupBthof='.$pub_GroupBthof.'" style="color: lime;"';
         echo '>Prod Mini&egrave;re</a></td>',"\n";
@@ -256,9 +257,9 @@
 
     switch ($pub_subaction)
     {
-        case "Batiments" : // Page Bâtiments
+        case "Batiments" : // Page BÃ¢timents
             Create_HOF($Building_Name, $Building_Label, $Building_icon,
-                       "Bâtiments", "user_building", $number,$affichage);
+                       "B&acirc;timents", "user_building", $number,$affichage);
             break;
 
         case "Flottes" : // Page Flottes
@@ -271,17 +272,17 @@
                        "user_technology", 15, $affichage);
             break;
 
-        case "Defense" : // Page Défense
-            Create_HOF($Def_name, $Def_label, $Def_icon, "Défense", 
+        case "Defense" : // Page DÃ©fense
+            Create_HOF($Def_name, $Def_label, $Def_icon, "D&eacute;fense", 
                        "user_defence", 7, $affichage);
             break;
-        case "Production" : //Page production minière
+        case "Production" : //Page production miniÃ¨re
             $type_production = Array( Array( 'titre'=>'jour', 'x'=>1 ) , Array( 'titre'=>'semaine' , 'x'=>7 ) );
 
             Create_Mine_HOF();
 
             // Page de production de {$pub_mine}
-            if (is_array(${'production_'.$pub_mine})) { //Cas où personne n'a de bâtiment dans la bdd
+            if (is_array(${'production_'.$pub_mine})) { //Cas oÃ¹ personne n'a de bÃ¢timent dans la bdd
                 arsort(${'production_'.$pub_mine});
             }
             foreach($type_production as $tbl) {
@@ -323,7 +324,7 @@
             }
             break;
 
-        case "BBCode" : // Création  de la page BBCode
+        case "BBCode" : // CrÃ©ation  de la page BBCode
             echo "<p style='background-color : #273234;font-size : 18;'><font color='red'><b>Attention utilisation de la balise [table], pour le tableau des productions. (Tout les forums n'acceptent pas cette balise.)</b></font></p>\n";
             Get_BBCode();
             if ($pub_GroupBthof != 0) {
@@ -335,8 +336,8 @@
                 $bbcode .= "\n\n";
             }
 
-            $bbcode .= "[b][color=".$bbcode_t."]Bâtiments[/color][/b]\n\n";
-            $bbcode .= HOF_bbcode($Building_Name, $Building_Label, "Bâtiments",
+            $bbcode .= "[b][color=".$bbcode_t."]B&acirc;timents[/color][/b]\n\n";
+            $bbcode .= HOF_bbcode($Building_Name, $Building_Label, "B&acirc;timents",
                             "user_building", $number, $bbcode_o, $bbcode_r, 
                             $bbcode_l);
 
@@ -349,8 +350,8 @@
                             "user_technology", 15, $bbcode_o, $bbcode_r,
                             $bbcode_l);
 
-            $bbcode .= "\n\n[b][color=".$bbcode_t."]Défense[/color][/b]\n\n";
-            $bbcode .= HOF_bbcode($Def_name, $Def_label, "Défense",
+            $bbcode .= "\n\n[b][color=".$bbcode_t."]D&eacute;fense[/color][/b]\n\n";
+            $bbcode .= HOF_bbcode($Def_name, $Def_label, "D&eacute;fense",
                             "user_defence", 7, $bbcode_o, $bbcode_r, $bbcode_l);
 
             $bbcode .= "\n\n[b][color=".$bbcode_t."]Production par jour[/color][/b]\n\n";
@@ -378,7 +379,7 @@
                         <td class='c' style='color : #FF00FF;' colspan='2'>Apparence</td>
                     </tr>
                     <tr>
-                        <td style='background-color : #273234;'>Afficher les icônes graphiques</td>
+                        <td style='background-color : #273234;'>Afficher les ic&ocirc;nes graphiques</td>
                         <td style='width : 20%; background-color : #273234;'><input name='icon_display' type='checkbox' value='1' <?php if ($icon_display == 1) echo 'checked=\'checked\''; ?></td>
                     </tr>
                     <tr>
@@ -475,7 +476,7 @@
                     <td style='background-color : #273234; text-align : center;'>0.2</td>
                     <td style='background-color : #273234;'>
                         <ul>
-                            <li>Correction du parsing des résultats.</li>
+                            <li>Correction du parsing des rÃ©sultats.</li>
                         </ul>
                     </td>
                 </tr>
@@ -483,11 +484,11 @@
                     <td style='background-color : #273234; text-align : center;'>0.3</td>
                     <td style='background-color : #273234;'>
                         <ul>
-                            <li>Mise en place de l'affichage par onglets avec idée d' Oliwan.</li>
-                            <li>Ajout des Gifs Ogame des bâtiments, technologies, défense en se basant sur le skin indiqué dans le profil utilisateur (par défaut http://zebulondunet.free.fr/skin/gebaeude/).</li>
-                            <li>Ajout de la fonction de création de BBCode.</li>
-                            <li>Réorganisation du source (fonctions, tableaux).</li>
-                            <li>Première intégration d'informations totaux de production minière par jour.</li>
+                            <li>Mise en place de l'affichage par onglets avec idÃ©e d' Oliwan.</li>
+                            <li>Ajout des Gifs Ogame des bÃ¢timents, technologies, dÃ©fense en se basant sur le skin indiquÃ© dans le profil utilisateur (par dÃ©faut http://zebulondunet.free.fr/skin/gebaeude/).</li>
+                            <li>Ajout de la fonction de crÃ©ation de BBCode.</li>
+                            <li>RÃ©organisation du source (fonctions, tableaux).</li>
+                            <li>PremiÃ¨re intÃ©gration d'informations totaux de production miniÃ¨re par jour.</li>
                         </ul>
                     </td>
                 </tr>
@@ -495,17 +496,17 @@
                 <tr>
                     <td style='background-color : #273234; text-align : center;'>0.4</td>
                     <td style='background-color : #273234;'>
-                        <i>Version personnalisée par Lithie</i>
+                        <i>Version personnalisÃ©e par Lithie</i>
                         <ul>
                             <li>Modification du design en utilisant des liens avec du subaction en get.</li>
-                            <li>Regroupement des classements de production sous un seul onglet (Prod Minière).</li>
+                            <li>Regroupement des classements de production sous un seul onglet (Prod MiniÃ¨re).</li>
                             <li>Espace BBCode : ajout des hof de production et coloration (sur le principe de _LaNceLoT_).</li>
-                            <li>Mise en place du choix d'affichage des images (méthode proposée par Oliwan).</li>
+                            <li>Mise en place du choix d'affichage des images (mÃ©thode proposÃ©e par Oliwan).</li>
                             <li>Ajout du choix des couleurs (en partie admin) pour l'espace BBCode.</li>
-                            <li>Changement du lien par défaut pour les images (celui du serveur).</li>
-                            <li>Espace BBCode : retrait de la balise [list] remplacée par \" - \" à chaque entrée.</li>
+                            <li>Changement du lien par dÃ©faut pour les images (celui du serveur).</li>
+                            <li>Espace BBCode : retrait de la balise [list] remplacÃ©e par \" - \" Ã  chaque entrÃ©e.</li>
                             <li>Activation du choix d'affichage des images via la partie admin.</li>
-                            <li>Numérotage du classement dans Prod. Minière.</li>
+                            <li>NumÃ©rotage du classement dans Prod. MiniÃ¨re.</li>
                         </ul>
                     </td>
                 </tr>
@@ -513,7 +514,7 @@
                 <tr>
                     <td style='background-color : #273234; text-align : center;'>0.5a</td>
                     <td style='background-color : #273234;'>
-                        <i>Mise à jour par Shad</i>
+                        <i>Mise Ã  jour par Shad</i>
                         <ul>
                             <li>Ajout d'une section flotte.</li>
                         </ul>
@@ -523,7 +524,7 @@
                 <tr>
                     <td style='background-color : #273234; text-align : center;'>0.5b</td>
                     <td style='background-color : #273234;'>
-                        <i>Mise à jour par Tehty</i>
+                        <i>Mise Ã  jour par Tehty</i>
                         <ul>
                             <li>Suppression de bug.</li>
                         </ul>
@@ -533,7 +534,7 @@
                 <tr>
                     <td style='background-color : #273234; text-align : center;'>0.5c</td>
                     <td style='background-color : #273234;'>
-                        <i>Mise à jour par Naruto kun</i>
+                        <i>Mise Ã  jour par Naruto kun</i>
                         <ul>
                             <li>Suppression de bug.</li>
                         </ul>
@@ -542,17 +543,17 @@
                 <tr>
                     <td style='background-color : #273234; text-align : center;'>0.6</td>
                     <td style='background-color : #273234;'>
-                        <i>Mise à jour par scaler</i>
+                        <i>Mise Ã  jour par scaler</i>
                         <ul>
-                            <li>Nouvelle formule de production d'énergie de la Centrale Électrique de Fusion avec la version 0.78a d'OGame.</li>
-                            <li>Calcul du facteur de production erroné.</li>
+                            <li>Nouvelle formule de production d'Ã©nergie de la Centrale Ã‰lectrique de Fusion avec la version 0.78a d'OGame.</li>
+                            <li>Calcul du facteur de production erronÃ©.</li>
                         </ul>
                     </td>
                 </tr>
                 <tr>
                     <td style='background-color : #273234; text-align : center;'>0.6a</td>
                     <td style='background-color : #273234;'>
-                        <i>Mise à jour par Ninety</i>
+                        <i>Mise Ã  jour par Ninety</i>
                         <ul>
                             <li>Les tableaux ont ete re-codes (plus propre au niveau du code + apparence).</li>
                             <li>Changement mineur a niveau du BBCode.</li>
@@ -560,12 +561,12 @@
                             <li>Changement de l'apparence de la partie Admin et Change Log.</li>
                             <li>Modification du menu. (ericc)</li>
                             <li>Ajout d'une colonne "Cumul Total". (ericc)</li>
-                            <li>Détection de la présence du Mod_flottes. (ericc)</li>
-                            <li>Les fonctions sont maintenant dans un fichier séparé. (ericc)</li>
-                            <li>La mise à jour de la table flotte ne se fait que pour la page flotte (gain de temps) (ericc)</li>
-                            <li>Les icones sont maintenant celle du skin séléctionnée.Si elles ne sont pas présentes dans le skin, on va chercher celles de Ogame (ralentissement de l'affichage). (Sylar)</li>
-                            <li>La techonologie expédition a la même place que dans OGame. (Sylar) </li>
-                            <li>Une colonne 'Total' dans les productions minière. (Sylar) </li>
+                            <li>DÃ©tection de la prÃ©sence du Mod_flottes. (ericc)</li>
+                            <li>Les fonctions sont maintenant dans un fichier sÃ©parÃ©. (ericc)</li>
+                            <li>La mise Ã  jour de la table flotte ne se fait que pour la page flotte (gain de temps) (ericc)</li>
+                            <li>Les icones sont maintenant celle du skin sÃ©lÃ©ctionnÃ©e.Si elles ne sont pas prÃ©sentes dans le skin, on va chercher celles de Ogame (ralentissement de l'affichage). (Sylar)</li>
+                            <li>La techonologie expÃ©dition a la mÃªme place que dans OGame. (Sylar) </li>
+                            <li>Une colonne 'Total' dans les productions miniÃ¨re. (Sylar) </li>
                             <li>Simplification du code d'affichage des productions. </li>
                         </ul>
                     </td>
@@ -573,22 +574,22 @@
                 <tr>
                     <td style='background-color : #273234; text-align : center;'>0.6b</td>
                     <td style='background-color : #273234;'>
-                        <i>Mise à jour par ericc</i>
+                        <i>Mise Ã  jour par ericc</i>
                         <ul>
                             <li>Simplification du code d'affichage des icones.</li>
-                            <li>Correction du bug d'affichage si les icones n'était pas validés.</li>
+                            <li>Correction du bug d'affichage si les icones n'Ã©tait pas validÃ©s.</li>
                         </ul>
                     </td>
                 </tr>
                 <tr>
                     <td style='background-color : #273234; text-align : center;'>1.0.0</td>
                     <td style='background-color : #273234;'>
-                        <i>Mise à jour par Shad</i>
+                        <i>Mise Ã  jour par Shad</i>
                         <ul>
                             <li>Changement du lien qui affiche les images.</li>
                             <li>Mise a jour des fonctions d'install, update et uninstall.</li>
-                            <li>Remise a jour des id planètes et prise en compte du nombre de planètes et lunes.</li>
-                            <li>Remplacement de la techonologie expédition par astrophysique.</li>
+                            <li>Remise a jour des id planÃ¨tes et prise en compte du nombre de planÃ¨tes et lunes.</li>
+                            <li>Remplacement de la techonologie expÃ©dition par astrophysique.</li>
                             <li>Prise en compte de la vitesse de l'uni.</li>
                             
                         </ul>
@@ -597,16 +598,16 @@
                 <tr>
                     <td style='background-color : #273234; text-align : center;'>1.0.1</td>
                     <td style='background-color : #273234;'>
-                        <i>Mise à jour par Shad</i>
+                        <i>Mise Ã  jour par Shad</i>
                         <ul>
-                            <li>Prise en compte du dépôt de ravitaillement si activé sur le serveur.</li>								
+                            <li>Prise en compte du dÃ©pÃ´t de ravitaillement si activÃ© sur le serveur.</li>								
                         </ul>
                     </td>
                 </tr>
                 <tr>
                     <td style='background-color : #273234; text-align : center;'>1.0.2</td>
                     <td style='background-color : #273234;'>
-                        <i>Mise à jour par Shad</i>
+                        <i>Mise Ã  jour par Shad</i>
                         <ul>
                             <li>Correction de bug.</li>								
                         </ul>
@@ -615,16 +616,16 @@
                 <tr>
                     <td style='background-color : #273234; text-align : center;'>1.0.3</td>
                     <td style='background-color : #273234;'>
-                        <i>Mise à jour par Shad</i>
+                        <i>Mise Ã  jour par Shad</i>
                         <ul>
-                            <li>Ajout des cachettes métal, cristal et deutérium.</li>
+                            <li>Ajout des cachettes mÃ©tal, cristal et deutÃ©rium.</li>
                         </ul>
                     </td>
                 </tr>
                 <tr>
                     <td style='background-color : #273234; text-align : center;'>1.0.4</td>
                     <td style='background-color : #273234;'>
-                        <i>Mise à jour par Pitch314</i>
+                        <i>Mise Ã  jour par Pitch314</i>
                         <ul>
                             <li>Correction erreur sur miniatures inexistantes.</li>
                         </ul>
@@ -633,32 +634,43 @@
                 <tr>
                     <td style='background-color : #273234; text-align : center;'>1.1.0</td>
                     <td style='background-color : #273234;'>
-                        <i>Mise à jour par Pitch314</i>
+                        <i>Mise Ã  jour par Pitch314</i>
                         <ul>
                             <li>Correction pour serveur sans "Curl".</li>
                             <li>Prise en compte de la technologie plasma.</li>
                             <li>Optimisation HOF production.</li>
-                            <li>Correction et ajout au générateur de BBcode.</li>
+                            <li>Correction et ajout au gÃ©nÃ©rateur de BBcode.</li>
                         </ul>
                     </td>
                 </tr>
                 <tr>
                     <td style='background-color : #273234; text-align : center;'>1.1.1</td>
                     <td style='background-color : #273234;'>
-                        <i>Mise à jour par Pitch314</i>
+                        <i>Mise Ã  jour par Pitch314</i>
                         <ul>
-                            <li>Légères corrections (valeurs entières dans le BBcode, script de statistique)</li>
-                            <li>Correction du comportement/affichage s'il n'y a aucun classement/bâtiment</li>
+                            <li>LÃ©gÃ¨res corrections (valeurs entiÃ¨res dans le BBcode, script de statistique)</li>
+                            <li>Correction du comportement/affichage s'il n'y a aucun classement/bÃ¢timent</li>
                         </ul>
                     </td>
                 </tr>
                 <tr>
                     <td style='background-color : #273234; text-align : center;'>1.1.2</td>
                     <td style='background-color : #273234;'>
-                        <i>Mise à jour par Pitch314 (nov 2013)</i>
+                        <i>Mise Ã  jour par Pitch314 (nov 2013)</i>
                         <ul>
-                            <li>[Fonctionnalité] HOF pour un groupe d'OGSpy particulier</li>
-                            <li>Ajout sommaire des stats cumulées dans le BBcode</li>
+                            <li>[FonctionnalitÃ©] HOF pour un groupe d'OGSpy particulier</li>
+                            <li>Ajout sommaire des stats cumulÃ©es dans le BBcode</li>
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+                    <td style='background-color : #273234; text-align : center;'>1.1.3</td>
+                    <td style='background-color : #273234;'>
+                        <i>Mise Ã  jour par Pitch314 (aout 2015)</i>
+                        <ul>
+                            <li>[Bug] Correction utilisation BDD (OGSpy 3.2.x)</li>
+                            <li>Mise en forme UTF-8</li>
+                            <li>Mise en forme des nombres supÃ©rieur au millier</li>
                         </ul>
                     </td>
                 </tr>
