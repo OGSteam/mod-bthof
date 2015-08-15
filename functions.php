@@ -257,7 +257,7 @@
                         echo "&nbsp;";
                     }
                     echo $Table_label[$NoBld] . '</td>' . "\n\t\t\t\t";
-                    echo '<td style=\'color : #FF80F0; background-color : #273234; text-align: center; \'>' . $row[0] . '</td>' . "\n\t\t\t\t";
+                    echo '<td style=\'color : #FF80F0; background-color : #273234; text-align: center; \'>' . number_format($row[0], 0, ',', ' ') . '</td>' . "\n\t\t\t\t";
                     echo '<td style=\'color : #FFFFF0; background-color : #273234; text-align: center; \'>' . $row[1];
                 }
             } while (($row = $db->sql_fetch_row($result)));
@@ -288,7 +288,7 @@
                       //on enregistre la valeur max, les résultats étant classé par ordre décroissant, le premier est le plus élevé !!
                         $val_max = $row2[0];
                         echo '<td  width=\'50px\' style=\'color : #FF80F0; background-color : #273234; text-align: center; \'>';
-                        printf("%s</td><td width=\"400px\" style=\"color : #FFFFF0; background-color : #273234; text-align: center; \">%s", $row2[0],$row2[1]);
+                        printf("%s</td><td width=\"400px\" style=\"color : #FFFFF0; background-color : #273234; text-align: center; \">%s", number_format($row2[0], 0, ',', ' '),$row2[1]);
                     }
                 } while ($row2 = $db->sql_fetch_row($result2)) ;
             }
@@ -362,9 +362,9 @@
                         $bbcode .= " - [color=".$b1."]".$Table_label[$NoBld]."[/color]";
                     }
                     if($b2=='') {
-                        $bbcode .= $row[0];
+                        $bbcode .= number_format($row[0], 0, ',', ' ');
                     } else {
-                        $bbcode .= " : [color=".$b2."]".$row[0]."[/color]";
+                        $bbcode .= " : [color=".$b2."]".number_format($row[0], 0, ',', ' ')."[/color]";
                     }
                     if($b3=='') {
                         $bbcode .= $row[1];
@@ -405,9 +405,9 @@
                             $bbcode .= " - [color=".$b1."]".$Table_label[$NoBld]."[/color]";
                         }
                         if($b2=='') {
-                            $bbcode .= $row[0];
+                            $bbcode .= number_format($row[0], 0, ',', ' ');
                         } else {
-                            $bbcode .= " : [color=".$b2."]".$row[0]."[/color]";
+                            $bbcode .= " : [color=".$b2."]".number_format($row[0], 0, ',', ' ')."[/color]";
                         }
                         if($b3=='') {
                             $bbcode .= $row[1];
@@ -438,9 +438,9 @@
 
         $maxvalue = doublemax($prod_metal);
         if($b1=='') {
-            $bbcode .= "- Métal : ";
+            $bbcode .= "- M&eacute;tal : ";
         } else {
-            $bbcode .= "- [color=".$b1."]Métal : [/color]";
+            $bbcode .= "- [color=".$b1."]M&eacute;tal : [/color]";
         }
         if($b2=='') {
             $bbcode .= number_format($maxvalue['m'], 0, ',', ' ')." : ";
@@ -474,9 +474,9 @@
         // arsort($prod_deuterium);
         // list($key,$val) = each($prod_deuterium);
         if($b1=='') {
-            $bbcode .= "- Deutérium : ";
+            $bbcode .= "- Deut&eacute;rium : ";
         } else {
-            $bbcode .= "- [color=".$b1."]Deutérium : [/color]";
+            $bbcode .= "- [color=".$b1."]Deut&eacute;rium : [/color]";
         }
         if($b2=='') {
             $bbcode .= number_format($maxvalue['m'], 0, ',', ' ')." : ";
@@ -490,13 +490,13 @@
         }
 
         arsort($prod_total);
-        $bbcode .= "\n\n[b][color=".$b4."]Classement production minière :[/color][/b]\n";
+        $bbcode .= "\n\n[b][color=".$b4."]Classement production mini&egrave;re :[/color][/b]\n";
 
         $bbcode .= '[table cellspacing="2"]'."\n";
         $bbcode .= '[tr][td colspan="2"][color=#ff00ff][b]Production par jour[/b][/color][/td]';
-        $bbcode .= '[td][color=#00ffff][b]Métal[/b][/color][/td]';
+        $bbcode .= '[td][color=#00ffff][b]M&eacute;tal[/b][/color][/td]';
         $bbcode .= '[td][color=#00ffff][b]Cristal[/b][/color][/td]';
-        $bbcode .= '[td][color=#00ffff][b]Deutérium[/b][/color][/td]';
+        $bbcode .= '[td][color=#00ffff][b]Deut&eacute;rium[/b][/color][/td]';
         $bbcode .= '[td align="center"][b]Total[/b][/td][/tr]'."\n";
 
         $nb = 1;
