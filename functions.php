@@ -317,13 +317,14 @@
     function HOF_bbcode($Table_name, $Table_label, $Title, $OGSpy_Table, $NbItems,
                         $b1, $b2, $b3)
     {
-        if (!isset($table_prefix))    { global $table_prefix; }
-        if (!isset($db))              { global $db; }
-        if (!isset($lien))            { global $lien; }
-        if (!isset($bbcode))          { global $bbcode; }
-        if (!isset ($cachetteEnable)) { global $cachetteEnable; }
-        if (!isset ($depotEnable))    { global $depotEnable; }
-        global $pub_GroupBthof;
+        if (!isset($table_prefix))   { global $table_prefix; }
+        if (!isset($db))             { global $db; }
+        if (!isset($lien))           { global $lien; }
+        if (!isset($bbcode))         { global $bbcode; }
+        if (!isset($cachetteEnable)) { global $cachetteEnable; }
+        if (!isset($depotEnable))    { global $depotEnable; }
+        if (!isset($dockEnable))     { global $dockEnable; }
+        if (!isset($pub_GroupBthof)) { global $pub_GroupBthof; }
 
         for ($NoBld=0 ; $NoBld < $NbItems ; $NoBld ++)
         {
