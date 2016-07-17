@@ -32,6 +32,7 @@ if(!$result)
 		."  `bbcode_o` varchar(8) NOT NULL default '' COMMENT 'couleur bbcode pour les objets (ex : Mine de Métal)',"
 		."  `bbcode_r` varchar(8) NOT NULL default '' COMMENT 'couleur bbcode pour les valeurs de records (ex : 28)',"
 		."  `bbcode_l` varchar(8) NOT NULL default '' COMMENT 'couleur bbcode pour les recordmens (ex : toto, titi)',"
+        ."  `bbcode_format` varchar(8) NOT NULL default '1' COMMENT 'format de BBCode choisi (voir https://forum.ogsteam.fr/index.php/topic,965.0.html)',"
 		."  PRIMARY KEY  (`user_id`)"
 		."  ) COMMENT='sauvegarde des paramètres bt_hof'";
 	$db->sql_query($query);
@@ -47,7 +48,7 @@ elseif($conf_existe == 0)
 	{	// Ajout des champs pour le bbcode
 			echo "ajout\n";
 
-		$query = "ALTER TABLE `".$table_prefix.'bthof_conf'."` ADD `bbcode_t` varchar(8) NOT NULL, ADD `bbcode_o` varchar(8) NOT NULL, ADD `bbcode_r` varchar(8) NOT NULL, ADD `bbcode_l` varchar(8) NOT NULL";
+		$query = "ALTER TABLE `".$table_prefix.'bthof_conf'."` ADD `bbcode_t` varchar(8) NOT NULL, ADD `bbcode_o` varchar(8) NOT NULL, ADD `bbcode_r` varchar(8) NOT NULL, ADD `bbcode_l` varchar(8) NOT NULL, ADD `bbcode_format` varchar(8) NOT NULL default '1'";
 		$db->sql_query($query);
 	}
 	//Insertion des valeurs par défaut
@@ -80,6 +81,10 @@ if ($version == "0.4") {
 	."	PRIMARY KEY (`user_id`)"
 	."	) COMMENT='flotte de la partie bt_hof'";
 	$db->sql_query($query2);
+}
+if($version == "1.1.4") {
+    $query = $query = "ALTER TABLE `".TABLE_BTHOF_CONF."` ADD `bbcode_format` varchar(8) NOT NULL default '1'";
+    $db->sql_query($query);
 }
 
 $mod_folder = "bthof";
