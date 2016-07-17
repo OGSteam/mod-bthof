@@ -10,6 +10,7 @@
  *   - 10/11/2013 par Pitch314 : Ajout de la fonctionnalité de séparation des HOF
  *                      par groupe OGSpy. 
  *   - 13/06/2015 par Pitch314 : Normalisation utilisation BDD + UTF8
+ *   - 17/07/2016 par Pitch314 : Ajout vérification traitement pour les cachettes, dépôt et dock spatial
  * **************************************************************************** */
 
 /**
@@ -23,13 +24,6 @@
 * @version 11-10-2013, v1.1
 * @modified 11/10/2013
 */
-    // On vérifie que le dépôt de ravitaillement soit activé sur l'univers.
-    $ddr = $server_config['ddr'];
-    if ($ddr == 1) {
-        $number ="20";
-    } else {
-        $number ="19";
-    }
 
     // ==============================================
     // = Calcul du classement de production minière =
@@ -165,9 +159,12 @@
     function Create_HOF($Table_name, $Table_label, $Table_icon, $Title,
                         $OGSpy_Table, $NbItems, $affich)
     {
-        if (!isset ($table_prefix)) { global $table_prefix; }
-        if (!isset ($db))           { global $db; }
-        if (!isset ($lien))         { global $lien; }
+        if (!isset ($table_prefix))   { global $table_prefix; }
+        if (!isset ($db))             { global $db; }
+        if (!isset ($lien))           { global $lien; }
+        if (!isset ($cachetteEnable)) { global $cachetteEnable; }
+        if (!isset ($depotEnable))    { global $depotEnable; }
+        if (!isset ($dockEnable))     { global $dockEnable; }
 
         // Contrôle de l'existance du mod flottes
         if ($OGSpy_Table == "bthof_flottes")
@@ -196,8 +193,21 @@
         print ("<tr> <td width=\"30px\">&nbsp;</td> </tr>");
 
         //Pour chaque Batiment/techno/flotte
-        for ($NoBld=0 ; $NoBld <= $NbItems ; $NoBld ++)
+        for ($NoBld=0 ; $NoBld < $NbItems ; $NoBld ++)
         {
+            //Cas non présence des cachettes dans la BDD
+            if(($NoBld==11 || $NoBld==12 || $NoBld==13) && $cachetteEnable==0) {
+                continue; // Pas de cachette = on saute au bâtiment suivant.
+            }
+            //Cas présence dépôt de ravitaillement
+            if($NoBld==20 && $depotEnable==0) {
+                continue; //Pas de dépôt de ravitaillement dans l'univers.
+            }
+            //Cas non présence du dock spatial
+            if($NoBld==21 && $dockEnable==0) {
+                continue; //Pas de dock spatial.
+            }
+            
             $sqlEnd = "($Table_name[$NoBld]), user_name FROM ".$table_prefix.$OGSpy_Table." T JOIN ";
             if ($pub_GroupBthof == 0) {
                 $sqlEnd = $sqlEnd.TABLE_USER;
@@ -307,14 +317,29 @@
     function HOF_bbcode($Table_name, $Table_label, $Title, $OGSpy_Table, $NbItems,
                         $b1, $b2, $b3)
     {
-        if (!isset($table_prefix)) { global $table_prefix; }
-        if (!isset($db))           { global $db; }
-        if (!isset($lien))         { global $lien; }
-        if (!isset($bbcode))       { global $bbcode; }
+        if (!isset($table_prefix))    { global $table_prefix; }
+        if (!isset($db))              { global $db; }
+        if (!isset($lien))            { global $lien; }
+        if (!isset($bbcode))          { global $bbcode; }
+        if (!isset ($cachetteEnable)) { global $cachetteEnable; }
+        if (!isset ($depotEnable))    { global $depotEnable; }
         global $pub_GroupBthof;
 
-        for ($NoBld=0;$NoBld<=$NbItems;$NoBld ++)
+        for ($NoBld=0 ; $NoBld < $NbItems ; $NoBld ++)
         {
+            //Cas non présence des cachettes dans la BDD
+            if(($NoBld==11 || $NoBld==12 || $NoBld==13) && $cachetteEnable==0) {
+                continue; // Pas de cachette = on saute au bâtiment suivant.
+            }
+            //Cas présence dépôt de ravitaillement
+            if($NoBld==20 && $depotEnable==0) {
+                continue; //Pas de dépôt de ravitaillement dans l'univers.
+            }
+            //Cas non présence du dock spatial
+            if($NoBld==21 && $dockEnable==0) {
+                continue; //Pas de dock spatial.
+            }
+            
             $sqlEnd = "($Table_name[$NoBld]), user_name FROM ".$table_prefix.$OGSpy_Table." T JOIN ";
             if ($pub_GroupBthof == 0) {
                 $sqlEnd = $sqlEnd.TABLE_USER;
