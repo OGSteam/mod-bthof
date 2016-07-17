@@ -13,8 +13,8 @@ define('TABLE_BTHOF_FLOTTES',$table_prefix.'bthof_flottes');
 $query = "SELECT * FROM ".TABLE_BTHOF_CONF." WHERE 1";
 $result = $db->sql_query($query);
 $conf_existe = $db->sql_numrows($result);
-if($result instanceof mysqli) {
-    $conf_03 = mysqli_field_count($result);
+if($result instanceof mysqli_result) {
+    $conf_03 = $result->field_count;
 } else {
     $conf_03 = mysql_num_fields($result);
 }
