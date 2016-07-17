@@ -134,7 +134,7 @@
     //Vérification présence cachette :
     $cachetteEnable = 1;
     //$sql1 = "SHOW COLUMNS FROM ".TABLE_USER_BUILDING." WHERE field='CM'";
-    $sql1 = "SELECT column_name FROM INFORMATION_SCHEMA.COLUMNS WHERE table_schema='".$db->dbname."' and table_name='".TABLE_USER_BUILDING."' and column_name='$Table_name[12]'";
+    $sql1 = "SELECT column_name FROM INFORMATION_SCHEMA.COLUMNS WHERE table_schema='".$db->dbname."' and table_name='".TABLE_USER_BUILDING."' and column_name='$Building_Name[12]'";
     $result = $db->sql_query($sql1);
     if($db->sql_numrows($result) == 0) {
         $cachetteEnable = 0;
@@ -408,7 +408,7 @@
                     </tr>
                     <tr>
                         <td style='background-color : #273234;'>Afficher les ic&ocirc;nes graphiques</td>
-                        <td style='width : 20%; background-color : #273234;'><input name='icon_display' type='checkbox' value='1' <?php if ($icon_display == 1) echo 'checked=\'checked\''; ?></td>
+                        <td style='width : 20%; background-color : #273234;'><input name='icon_display' type='checkbox' value='1' <?php if ($icon_display == 1) echo 'checked=\'checked\''; ?> /></td>
                     </tr>
                     <tr>
                         <td style='background-color : #273234;' colspan='3'><input type='submit' name='add_admin' value='Enregistrer' /></td>
@@ -476,6 +476,20 @@
 ?>
                             </select>
                         </td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td style='background-color : #273234; color:cyan'>Choix du type de BBCode</td>
+                        <td style='width : 20%; background-color : #273234;'>
+                            <select name='bbcode_format'>
+<?php
+                                for ($i = 1 ; $i < 5 ; $i++) {
+                                    echo '<option value=\'' . $i . '\' ' . ($i == $bbcode_format ? "selected" : "disabled") . '>F' . $i . '</option>';
+                                }
+?>
+                            </select></td>
                     </tr>
                     <tr>
                         <td style='background-color : #273234;' colspan='3'><input type='submit' name='add_bbcode' value='Enregistrer' /></td>
