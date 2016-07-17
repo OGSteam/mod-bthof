@@ -11,6 +11,7 @@
  *   - 10/11/2013 par Pitch314 : Ajout de la fonctionnalité de séparation des HOF
  *                      par groupe OGSpy.
  *   - 15/08/2015 par Pitch314 : Normalisation utilisation BDD + UTF8
+ *   - 17/07/2016 par Pitch314 : Ajout vérification traitement pour les cachettes, dépôt et dock spatial
  * **************************************************************************** */
 
 /* ************************************************************************* *
@@ -99,22 +100,27 @@
 
     $bbcode = "[color=orange][b][u]HoF B&acirc;timents - Flottes - Technologies - D&eacute;fense - Production Miniere[/u][/b][/color]\n\n";
 
-    $Building_Name  = array("M"            ,"C"              ,"D"                        ,"CES"                        ,"CEF"                          ,"UdR"            ,"UdN"              ,"CSp"             ,"HM"             ,"HC"               ,"HD"                    ,"CM"               ,"CC"                 ,"CD"                   ,"Lab"                     ,"Ter"         ,"Silo"             ,"BaLu"        ,"Pha"                ,"PoSa"                 ,"DdR");
-    $Building_Label = array("Mine de m&eacute;tal","Mine de cristal","Synth&eacute;tiseur de deut&eacute;rium","Centrale &eacute;lectrique solaire","Centrale &eacute;lectrique de fusion","Usine de robots","Usine de nanites ","Chantier spatial","Hangar de m&eacute;tal","Hangar de cristal","R&eacute;servoir de deut&eacute;rium","Cachette de m&eacute;tal","Cachette de cristal","Cachette de deut&eacute;rium","Laboratoire de recherche","Terraformeur","Silo de missiles ","Base lunaire","Phalange de capteur","Porte de saut spatial","D&eacute;p&ocirc;t de ravitaillement");
-    $Building_icon  = array("1.gif"        ,"2.gif"          ,"3.gif"                    ,"4.gif"                      ,"12.gif"                       ,"14.gif"         ,"15.gif"           ,"21.gif"          ,"22.gif"         ,"23.gif"           ,"24.gif"                ,"25.gif"           ,"26.gif"             ,"27.gif"               ,"31.gif"                  ,"33.gif"      ,"44.gif"           ,"41.gif"      ,"42.gif"             ,"43.gif"               ,"34.gif");
+    $Building_Name  = array("M"                   ,"C"              ,"D"                                      ,"CES"                               ,"CEF"                                 ,"UdR"            ,"UdN"              ,"CSp"             ,"HM"                    ,"HC"               ,"HD"                                  ,"CM"                      ,"CC"                 ,"CD"                          ,"Lab"                     ,"Ter"         ,"Silo"             ,"BaLu"        ,"Pha"                ,"PoSa"                 ,"DdR"                                 ,"Dock");
+    $Building_Label = array("Mine de m&eacute;tal","Mine de cristal","Synth&eacute;tiseur de deut&eacute;rium","Centrale &eacute;lectrique solaire","Centrale &eacute;lectrique de fusion","Usine de robots","Usine de nanites ","Chantier spatial","Hangar de m&eacute;tal","Hangar de cristal","R&eacute;servoir de deut&eacute;rium","Cachette de m&eacute;tal","Cachette de cristal","Cachette de deut&eacute;rium","Laboratoire de recherche","Terraformeur","Silo de missiles ","Base lunaire","Phalange de capteur","Porte de saut spatial","D&eacute;p&ocirc;t de ravitaillement","Dock spatial");
+    $Building_icon  = array("1.gif"               ,"2.gif"          ,"3.gif"                                  ,"4.gif"                             ,"12.gif"                              ,"14.gif"         ,"15.gif"           ,"21.gif"          ,"22.gif"                ,"23.gif"           ,"24.gif"                              ,"25.gif"                  ,"26.gif"             ,"27.gif"                      ,"31.gif"                  ,"33.gif"      ,"44.gif"           ,"41.gif"      ,"42.gif"             ,"43.gif"               ,"34.gif"                              ,"35.gif");
 
-    $Flottes_Name  = array("PT"                ,"GT"                ,"CLE"           ,"CLO"           ,"CR"      ,"VB"                  ,"VC"                      ,"REC"      ,"SE"                ,"BMD"       ,"DST"        ,"EDLM"             ,"TRA"     ,"SAT");
+    $Flottes_Name  = array("PT"                ,"GT"                ,"CLE"                  ,"CLO"           ,"CR"      ,"VB"                  ,"VC"                      ,"REC"      ,"SE"                ,"BMD"       ,"DST"        ,"EDLM"                    ,"TRA"     ,"SAT");
     $Flottes_Label = array("Petit Transporteur","Grand Transporteur","Chasseur L&eacute;ger","Chasseur Lourd","Croiseur","Vaisseau de Bataille","Vaisseau de Colonisation","Recycleur","Sonde d'Espionnage","Bombardier","Destructeur","&Eacute;toile de la Mort","Traqueur","Satellite Solaire");
-    $Flottes_icon  = array("202.gif"           ,"203.gif"           ,"204.gif"       ,"205.gif"       ,"206.gif" ,"207.gif"             ,"208.gif"                 ,"209.gif"  ,"210.gif"           ,"211.gif"   ,"213.gif"    ,"214.gif"          ,"215.gif" ,"212.gif");
+    $Flottes_icon  = array("202.gif"           ,"203.gif"           ,"204.gif"              ,"205.gif"       ,"206.gif" ,"207.gif"             ,"208.gif"                 ,"209.gif"  ,"210.gif"           ,"211.gif"   ,"213.gif"    ,"214.gif"                 ,"215.gif" ,"212.gif");
 
-    $Tech_name     = array("Esp"                   ,"Ordi"                  ,"Armes"            ,"Bouclier"            ,"Protection"        ,"NRJ"                ,"Hyp"                    ,"RC"                   ,"RI"                  ,"PH"                    ,"Laser"            ,"Ions"            ,"Plasma"            ,"RRI"                ,"Astrophysique"            ,"Graviton");
+    $Tech_name     = array("Esp"                   ,"Ordi"                  ,"Armes"            ,"Bouclier"            ,"Protection"        ,"NRJ"                       ,"Hyp"                    ,"RC"                                 ,"RI"                                ,"PH"                    ,"Laser"            ,"Ions"            ,"Plasma"            ,"RRI"                       ,"Astrophysique"            ,"Graviton");
     $Tech_label    = array("Technologie Espionnage","Technologie Ordinateur","Technologie Armes","Technologie Bouclier","Protect. Vaisseaux","Technologie &Eacute;nergie","Technologie Hyperespace","R&eacute;acteur &agrave; Combustion","R&eacute;acteur &agrave; Impulsion","Propulsion Hyperespace","Technologie Laser","Technologie Ions","Technologie Plasma","R&eacute;seau de Recherche","Technologie Astrophysique","Technologie Graviton");
-    $Tech_icon     = array("106.gif"               ,"108.gif"               ,"109.gif"          ,"110.gif"             ,"111.gif"           ,"113.gif"            ,"114.gif"                ,"115.gif"              ,"117.gif"             ,"118.gif"               ,"120.gif"          ,"121.gif"         ,"122.gif"           ,"123.gif"            ,"124.gif"                  ,"199.gif");
+    $Tech_icon     = array("106.gif"               ,"108.gif"               ,"109.gif"          ,"110.gif"             ,"111.gif"           ,"113.gif"                   ,"114.gif"                ,"115.gif"                            ,"117.gif"                           ,"118.gif"               ,"120.gif"          ,"121.gif"         ,"122.gif"           ,"123.gif"                   ,"124.gif"                  ,"199.gif");
 
-    $Def_name      = array("LM"           ,"LLE"        ,"LLO"        ,"CG"         ,"AI"            ,"LP"          ,"MIC"                 ,"MIP");
+    $Def_name      = array("LM"           ,"LLE"               ,"LLO"        ,"CG"         ,"AI"            ,"LP"          ,"MIC"                 ,"MIP");
     $Def_label     = array("Lance Missile","Laser L&eacute;ger","Laser Lourd","Canon Gauss","Artillerie Ion","Lance Plasma","Missile Interception","Missile InterPlan&eacute;taire");
-    $Def_icon      = array("401.gif"      ,"402.gif"    ,"403.gif"    ,"404.gif"    ,"405.gif"       ,"406.gif"     ,"502.gif"             ,"503.gif");
+    $Def_icon      = array("401.gif"      ,"402.gif"           ,"403.gif"    ,"404.gif"    ,"405.gif"       ,"406.gif"     ,"502.gif"             ,"503.gif");
 
+    $nb_batiment = count($Building_Name);
+    $nb_flotte   = count($Flottes_Name);
+    $nb_techno   = count($Tech_name);
+    $nb_def      = count($Def_name);
+    
     if (!isset($nplayer))              { global $nplayer; }
     if (!isset($production_metal))     { global $production_metal; }
     if (!isset($production_cristal))   { global $production_cristal; }
@@ -125,6 +131,28 @@
 
     $nplayer=0;
 
+    //Vérification présence cachette :
+    $cachetteEnable = 1;
+    //$sql1 = "SHOW COLUMNS FROM ".TABLE_USER_BUILDING." WHERE field='CM'";
+    $sql1 = "SELECT column_name FROM INFORMATION_SCHEMA.COLUMNS WHERE table_schema='".$db->dbname."' and table_name='".TABLE_USER_BUILDING."' and column_name='$Table_name[12]'";
+    $result = $db->sql_query($sql1);
+    if($db->sql_numrows($result) == 0) {
+        $cachetteEnable = 0;
+    }
+    //Vérification activation dépôt
+    if($server_config['ddr'] == 1) {
+        $depotEnable = 1;
+    } else {
+        $depotEnable = 0;
+    }
+    //Vérification présence dock spatial
+    $dockEnable = 1;
+    $sql1 = "SHOW COLUMNS FROM ".TABLE_USER_BUILDING." WHERE field='Dock'";
+    $result = $db->sql_query($sql1);
+    if($db->sql_numrows($result) == 0) {
+        $dockEnable = 0;
+    }
+    
     /*Gestion du skin :*/
     $lien = "mod/bthof/picture/";
     // Prendre le skin serveur par défaut s'il n'y en a pas dans le profil utilisateur
@@ -259,22 +287,22 @@
     {
         case "Batiments" : // Page Bâtiments
             Create_HOF($Building_Name, $Building_Label, $Building_icon,
-                       "B&acirc;timents", "user_building", $number,$affichage);
+                       "B&acirc;timents", "user_building", $nb_batiment,$affichage);
             break;
 
         case "Flottes" : // Page Flottes
             Create_HOF($Flottes_Name, $Flottes_Label, $Flottes_icon, "Flottes", 
-                       "bthof_flottes", 13, $affichage);
+                       "bthof_flottes", $nb_flotte, $affichage);
             break;
 
         case "Techno" : //Page Technologies
             Create_HOF($Tech_name, $Tech_label, $Tech_icon, "Technologies", 
-                       "user_technology", 15, $affichage);
+                       "user_technology", $nb_techno, $affichage);
             break;
 
         case "Defense" : // Page Défense
             Create_HOF($Def_name, $Def_label, $Def_icon, "D&eacute;fense", 
-                       "user_defence", 7, $affichage);
+                       "user_defence", $nb_def, $affichage);
             break;
         case "Production" : //Page production minière
             $type_production = Array( Array( 'titre'=>'jour', 'x'=>1 ) , Array( 'titre'=>'semaine' , 'x'=>7 ) );
@@ -338,21 +366,21 @@
 
             $bbcode .= "[b][color=".$bbcode_t."]B&acirc;timents[/color][/b]\n\n";
             $bbcode .= HOF_bbcode($Building_Name, $Building_Label, "B&acirc;timents",
-                            "user_building", $number, $bbcode_o, $bbcode_r, 
+                            "user_building", $nb_batiment, $bbcode_o, $bbcode_r, 
                             $bbcode_l);
 
             $bbcode .= "\n\n[b][color=".$bbcode_t."]Flottes[/color][/b]\n\n";
             $bbcode .= HOF_bbcode($Flottes_Name, $Flottes_Label, "Flottes",
-                            "bthof_flottes", 13, $bbcode_o, $bbcode_r, $bbcode_l);
+                            "bthof_flottes", $nb_flotte, $bbcode_o, $bbcode_r, $bbcode_l);
 
             $bbcode .= "\n\n[b][color=".$bbcode_t."]Technologies[/color][/b]\n\n";
             $bbcode .= HOF_bbcode($Tech_name, $Tech_label, "Technologies",
-                            "user_technology", 15, $bbcode_o, $bbcode_r,
+                            "user_technology", $nb_techno, $bbcode_o, $bbcode_r,
                             $bbcode_l);
 
             $bbcode .= "\n\n[b][color=".$bbcode_t."]D&eacute;fense[/color][/b]\n\n";
             $bbcode .= HOF_bbcode($Def_name, $Def_label, "D&eacute;fense",
-                            "user_defence", 7, $bbcode_o, $bbcode_r, $bbcode_l);
+                            "user_defence", $nb_def, $bbcode_o, $bbcode_r, $bbcode_l);
 
             $bbcode .= "\n\n[b][color=".$bbcode_t."]Production par jour[/color][/b]\n\n";
             Create_Mine_HOF();
