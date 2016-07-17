@@ -29,6 +29,7 @@ if ($is_ok == true)	{
         ."  `bbcode_o` varchar(8) NOT NULL default '' COMMENT 'couleur bbcode pour les objets (ex : Mine de Métal)',"
         ."  `bbcode_r` varchar(8) NOT NULL default '' COMMENT 'couleur bbcode pour les valeurs de records (ex : 28)',"
         ."  `bbcode_l` varchar(8) NOT NULL default '' COMMENT 'couleur bbcode pour les recordmens (ex : toto, titi)',"
+        ."  `bbcode_format` varchar(8) NOT NULL default '1' COMMENT 'format de BBCode choisi (voir https://forum.ogsteam.fr/index.php/topic,965.0.html)',"
         ."  PRIMARY KEY  (`user_id`)"
         ."  ) COMMENT='sauvegarde des paramètres bt_hof'";
         $db->sql_query($query);
