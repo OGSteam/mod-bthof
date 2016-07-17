@@ -4,7 +4,6 @@ if (!defined('IN_SPYOGAME')) {
 }
 
 global $db;
-print_r($db);
 if (!isset($table_prefix)) global $table_prefix;
 
 define('TABLE_BTHOF_CONF',$table_prefix.'bthof_conf');
@@ -13,13 +12,12 @@ define('TABLE_BTHOF_FLOTTES',$table_prefix.'bthof_flottes');
 // Test de présence de la table de configuration
 $query = "SELECT * FROM ".TABLE_BTHOF_CONF." WHERE 1";
 $result = $db->sql_query($query);
-print_r($result);
 $conf_existe = $db->sql_numrows($result);
-// if($result instanceof mysqli) {
-    $conf_03 = $result->field_count;//mysqli_field_count($result);
-// } else {
-    // $conf_03 = mysql_num_fields($result);
-// }
+if($result instanceof mysqli_result) {
+    $conf_03 = $result->field_count;
+} else {
+    $conf_03 = mysql_num_fields($result);
+}
 echo $conf_03."\n";
 echo $conf_existe."\n";
 //echo $result."\n";
