@@ -544,7 +544,7 @@
     // =================================
     // = Sauvegarde des valeurs BBCode =
     // =================================
-    function Sauve_BBCode($bbcode_1, $bbcode_2, $bbcode_3, $bbcode_4)
+    function Sauve_BBCode($bbcode_1, $bbcode_2, $bbcode_3, $bbcode_4, $bbcode_f)
     {
         global $db;
         if (!isset($bbcode_t)) { global $bbcode_t; }
@@ -554,14 +554,14 @@
         if (!isset($bbcode_format)) { global $bbcode_format; }
 
         $request = "UPDATE ".TABLE_BTHOF_CONF.
-                  " SET bbcode_t='$bbcode_1', bbcode_o='$bbcode_2', bbcode_r='$bbcode_3', bbcode_l='$bbcode_4'";
+                  " SET bbcode_t='$bbcode_1', bbcode_o='$bbcode_2', bbcode_r='$bbcode_3', bbcode_l='$bbcode_4', bbcode_format='$bbcode_f'";
         $result = $db->sql_query($request);
 
         $bbcode_t = $bbcode_1;
         $bbcode_o = $bbcode_2;
         $bbcode_r = $bbcode_3;
         $bbcode_l = $bbcode_4;
-        $bbcode_format = 1;
+        $bbcode_format = $bbcode_f;
     }
 
     // ===================================
@@ -576,14 +576,14 @@
         if (!isset($bbcode_l)) { global $bbcode_l; }
         if (!isset($bbcode_format)) { global $bbcode_format; }
 
-        $request = "SELECT bbcode_t,bbcode_o,bbcode_r,bbcode_l FROM ".TABLE_BTHOF_CONF;
+        $request = "SELECT bbcode_t,bbcode_o,bbcode_r,bbcode_l,bbcode_format FROM ".TABLE_BTHOF_CONF;
         $result  = $db->sql_query($request);
         $val     = $db->sql_fetch_row($result);
         $bbcode_t = $val[0];
         $bbcode_o = $val[1];
         $bbcode_r = $val[2];
         $bbcode_l = $val[3];
-        $bbcode_format = 1;
+        $bbcode_format = $val[4];
     }
 
     // ==================================
