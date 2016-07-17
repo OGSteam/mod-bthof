@@ -417,7 +417,7 @@
             </form>
 <?php
             if (isset ($pub_add_bbcode)) {
-                Sauve_BBCode ($pub_bbcode_t, $pub_bbcode_o, $pub_bbcode_r, $pub_bbcode_l);
+                Sauve_BBCode ($pub_bbcode_t, $pub_bbcode_o, $pub_bbcode_r, $pub_bbcode_l, $pub_bbcode_format);
             } else { 
                 Get_BBCode();
             }
