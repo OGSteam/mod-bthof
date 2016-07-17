@@ -716,6 +716,17 @@
                         </ul>
                     </td>
                 </tr>
+                <tr>
+                    <td style='background-color : #273234; text-align : center;'>1.1.4</td>
+                    <td style='background-color : #273234;'>
+                        <i>Mise à jour par Pitch314 (juillet 2016)</i>
+                        <ul>
+                            <li>[Bug] Support cachettes pour ancien et nouveau OGSpy (OGSpy 3.3.x)</li>
+                            <li>Ajout gestion dock spatial</li>
+                            <li>Transformation BBCode en format F1 (<a href='https://forum.ogsteam.fr/index.php/topic,965.0.html'>Voir forum</a>)
+                        </ul>
+                    </td>
+                </tr>
             </table>
 <?php		
             break;
