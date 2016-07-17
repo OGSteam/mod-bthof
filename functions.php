@@ -354,7 +354,6 @@
             $sql1 = "SELECT MAX".$sqlEnd;
             $sql2 = "SELECT SUM".$sqlEnd;
 
-            //print_r("**SQL1=$sql1<br />**SQL2=$sql2<br /><br />\n");//////////////////////////////////////////////////////////////////TEST
             //Requête SQL pour récupérer la valeur Max de chaque type et le nom du joueur associé classé par ordre décroissant
             $result = $db->sql_query($sql1);
             
@@ -362,62 +361,69 @@
             // $sql = "SELECT MAX($Table_name[$NoBld]) ,user_name FROM ".$table_prefix.$OGSpy_Table." T JOIN ".TABLE_USER.
                    // " U ON U.user_id = T.user_id WHERE U.user_active='1' GROUP BY user_name ORDER BY 1 DESC";
             // //echo $NoBld .' : '.$sql.'<br />';
-            $val = -1;
             $premiere_fois = 0;
             $bbcode .= "";
-
-            while ($row = $db->sql_fetch_row($result))
-            {
+            
+            $row = $db->sql_fetch_row($result);
+            if($row == NULL) {
+                if($b1=='') {
+                    $bbcode .= " - ".$Table_label[$NoBld];
+                } else {
+                    $bbcode .= " - [color=".$b1."]".$Table_label[$NoBld]."[/color]";
+                }
+                $bbcode .= " : --\n";
+                continue;
+            }
+            $val_max = $row[0];
+            do {
                 $val = $row[0];
                 if ($val == 0) {
                     $row[1] = '-';
                 }
-                if($premiere_fois != 0)
-                {
-                    $premiere_fois++;
+                if($premiere_fois != 0) {
                     if ($val_max > $val || $val_max == 0) {
                         break;
                     }
-                    $bbcode .= ", ".$row[1];
+                    $bbcode .= ", ".$row[1]; //Nom des joueurs ex aequo
                 } else {
                     $premiere_fois++;
                     $val_max = $row[0];
-                    if($b1=='') {
+                    if($b1=='') { //Label
                         $bbcode .= " - ".$Table_label[$NoBld];
                     } else {
                         $bbcode .= " - [color=".$b1."]".$Table_label[$NoBld]."[/color]";
                     }
-                    if($b2=='') {
+                    if($b2=='') { //Nombre
                         $bbcode .= number_format($row[0], 0, ',', ' ');
                     } else {
                         $bbcode .= " : [color=".$b2."]".number_format($row[0], 0, ',', ' ')."[/color]";
                     }
-                    if($b3=='') {
+                    if($b3=='') { //Nom du joueur
                         $bbcode .= $row[1];
                     } else {
                         $bbcode .= " : [color=".$b3."]".$row[1];
                     }
 				}
-			}
-            if ($premiere_fois!=0) {
-                $bbcode .= "[/color]\n";
+			} while($row = $db->sql_fetch_row($result));
+            if($b3!='') {
+                $bbcode .= "[/color]";
             }
-            if ($Title != "Flottes" and $Title != "Technologies") 
-            {
+            $bbcode .= "\n";
+            
+            if($Title != "Flottes" && $Title != "Technologies" && $val != 0) {
                 //Requête SQL pour récupérer le total par joueur classé par ordre décroissant
                 $result2 = $db->sql_query($sql2);
-                $val = -1;
                 $premiere_fois = 0;
                 $bbcode .= "";
-                while ($row = $db->sql_fetch_row($result2))
-                {
+
+                $row = $db->sql_fetch_row($result2);
+                $val_max = $row[0];
+                do {
                     $val = $row[0];
                     if ($val == 0) {
                         $row[1] = '-';
                     }
-                    if($premiere_fois != 0)
-                    {
-                        $premiere_fois++;
+                    if($premiere_fois != 0) {
                         if ($val_max > $val || $val_max == 0) {
                             break;
                         }
@@ -425,11 +431,7 @@
                     } else {
                         $premiere_fois++;
                         $val_max = $row[0];
-                        if($b1=='') {
-                            $bbcode .= " - ".$Table_label[$NoBld];
-                        } else {
-                            $bbcode .= " - [color=".$b1."]".$Table_label[$NoBld]."[/color]";
-                        }
+                        $bbcode .= "[i]____[Cumul] ";
                         if($b2=='') {
                             $bbcode .= number_format($row[0], 0, ',', ' ');
                         } else {
@@ -441,12 +443,13 @@
                             $bbcode .= " : [color=".$b3."]".$row[1];
                         }
                     }
+                } while($row = $db->sql_fetch_row($result2));
+                if($b3!='') {
+                    $bbcode .= "[/color]";
                 }
-                if ($premiere_fois!=0) {
-                    $bbcode .= "[/color]\n";
-                }
+                $bbcode .= "[/i]\n";
+                
                 $db->sql_free_result($result2);
-                $bbcode .= "\n";
             }
             $db->sql_free_result($result);
 		}
