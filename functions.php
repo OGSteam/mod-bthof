@@ -196,15 +196,15 @@
         for ($NoBld=0 ; $NoBld < $NbItems ; $NoBld ++)
         {
             //Cas non présence des cachettes dans la BDD
-            if(($NoBld==11 || $NoBld==12 || $NoBld==13) && $cachetteEnable==0) {
+            if($Title=="B&acirc;timents" && ($NoBld==11 || $NoBld==12 || $NoBld==13) && $cachetteEnable==0) {
                 continue; // Pas de cachette = on saute au bâtiment suivant.
             }
             //Cas présence dépôt de ravitaillement
-            if($NoBld==20 && $depotEnable==0) {
+            if($Title=="B&acirc;timents" && $NoBld==20 && $depotEnable==0) {
                 continue; //Pas de dépôt de ravitaillement dans l'univers.
             }
             //Cas non présence du dock spatial
-            if($NoBld==21 && $dockEnable==0) {
+            if($Title=="B&acirc;timents" && $NoBld==21 && $dockEnable==0) {
                 continue; //Pas de dock spatial.
             }
             

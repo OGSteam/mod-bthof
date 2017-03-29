@@ -82,8 +82,8 @@ if ($version == "0.4") {
 	."	) COMMENT='flotte de la partie bt_hof'";
 	$db->sql_query($query2);
 }
-if($version == "1.1.4") {
-    $query = $query = "ALTER TABLE `".TABLE_BTHOF_CONF."` ADD `bbcode_format` varchar(8) NOT NULL default '1'";
+if($version < "1.1.4") {  
+    $query = "ALTER TABLE `".TABLE_BTHOF_CONF."` ADD `bbcode_format` varchar(8) NOT NULL default '1'";
     $db->sql_query($query);
 }
 

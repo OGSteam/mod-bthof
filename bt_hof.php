@@ -727,6 +727,16 @@
                         </ul>
                     </td>
                 </tr>
+                <tr>
+                    <td style='background-color : #273234; text-align : center;'>1.1.5</td>
+                    <td style='background-color : #273234;'>
+                        <i>Mise à jour par Pitch314 (février 2017)</i>
+                        <ul>
+                            <li>[Bug] Correction de la disparition de technologies et de vaisseaux dans les hof</li>
+                            <li>[Bug] Correction de la mise à jour si l'installation du mod a été faite en 1.1.4</li>
+                        </ul>
+                    </td>
+                </tr>
             </table>
 <?php		
             break;
