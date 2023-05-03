@@ -806,7 +806,7 @@ switch ($pub_subaction) {
                         <ul>
                             <li>[Bug] Support cachettes pour ancien et nouveau OGSpy (OGSpy 3.3.x)</li>
                             <li>Ajout gestion dock spatial</li>
-                            <li>Transformation BBCode en format F1 (<a href='https://forum.ogsteam.fr/index.php/topic,965.0.html'>Voir forum</a>)
+                            <li>Transformation BBCode en format F1 (<a href='https://forum.ogsteam.eu/index.php/topic,965.0.html'>Voir forum</a>)
                         </ul>
                     </td>
                 </tr>
